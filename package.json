@@ -1,0 +1,11 @@
+{
+    "name": "ieproes",
+    "version": "19.5.0",
+    "description": "ieproes",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "private": true,
+    "dependencies": {},
+    "engines": {
+        "node": ">=16"
+    }
+}
