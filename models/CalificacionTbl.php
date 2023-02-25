@@ -174,17 +174,17 @@ class CalificacionTbl extends DbTable
             'SELECT' // Edit Tag
         );
         $this->fk_id_alumno->InputTextType = "text";
-        $this->fk_id_alumno->IsForeignKey = true; // Foreign key field
         $this->fk_id_alumno->Nullable = false; // NOT NULL field
         $this->fk_id_alumno->Required = true; // Required field
         $this->fk_id_alumno->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->fk_id_alumno->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->fk_id_alumno->UseFilter = true; // Table header filter
         switch ($CurrentLanguage) {
             case "en-US":
-                $this->fk_id_alumno->Lookup = new Lookup('fk_id_alumno', 'alumnosporasigntura_vw', false, 'id_alumno', ["nombre_alumno","apellidos_alumno","numcarnet_alumno",""], '', '', ["x_fk_id_asignatura"], [], ["fk_id_asignatura"], ["x_fk_id_asignatura"], [], [], '', '', "CONCAT(COALESCE(`nombre_alumno`, ''),'" . ValueSeparator(1, $this->fk_id_alumno) . "',COALESCE(`apellidos_alumno`,''),'" . ValueSeparator(2, $this->fk_id_alumno) . "',COALESCE(`numcarnet_alumno`,''))");
+                $this->fk_id_alumno->Lookup = new Lookup('fk_id_alumno', 'alumnosporasigntura_vw', true, 'id_alumno', ["nombre_alumno","apellidos_alumno","numcarnet_alumno",""], '', '', ["x_fk_id_asignatura"], [], ["fk_id_asignatura"], ["x_fk_id_asignatura"], [], [], '', '', "CONCAT(COALESCE(`nombre_alumno`, ''),'" . ValueSeparator(1, $this->fk_id_alumno) . "',COALESCE(`apellidos_alumno`,''),'" . ValueSeparator(2, $this->fk_id_alumno) . "',COALESCE(`numcarnet_alumno`,''))");
                 break;
             default:
-                $this->fk_id_alumno->Lookup = new Lookup('fk_id_alumno', 'alumnosporasigntura_vw', false, 'id_alumno', ["nombre_alumno","apellidos_alumno","numcarnet_alumno",""], '', '', ["x_fk_id_asignatura"], [], ["fk_id_asignatura"], ["x_fk_id_asignatura"], [], [], '', '', "CONCAT(COALESCE(`nombre_alumno`, ''),'" . ValueSeparator(1, $this->fk_id_alumno) . "',COALESCE(`apellidos_alumno`,''),'" . ValueSeparator(2, $this->fk_id_alumno) . "',COALESCE(`numcarnet_alumno`,''))");
+                $this->fk_id_alumno->Lookup = new Lookup('fk_id_alumno', 'alumnosporasigntura_vw', true, 'id_alumno', ["nombre_alumno","apellidos_alumno","numcarnet_alumno",""], '', '', ["x_fk_id_asignatura"], [], ["fk_id_asignatura"], ["x_fk_id_asignatura"], [], [], '', '', "CONCAT(COALESCE(`nombre_alumno`, ''),'" . ValueSeparator(1, $this->fk_id_alumno) . "',COALESCE(`apellidos_alumno`,''),'" . ValueSeparator(2, $this->fk_id_alumno) . "',COALESCE(`numcarnet_alumno`,''))");
                 break;
         }
         $this->fk_id_alumno->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -260,12 +260,13 @@ class CalificacionTbl extends DbTable
         $this->fk_id_evaluacion->Required = true; // Required field
         $this->fk_id_evaluacion->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->fk_id_evaluacion->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->fk_id_evaluacion->UseFilter = true; // Table header filter
         switch ($CurrentLanguage) {
             case "en-US":
-                $this->fk_id_evaluacion->Lookup = new Lookup('fk_id_evaluacion', 'evaluacion_tbl', false, 'id_evaluacion', ["nombre_evaluacion","","",""], '', '', [], [], [], [], [], [], '`nombre_evaluacion`', '', "`nombre_evaluacion`");
+                $this->fk_id_evaluacion->Lookup = new Lookup('fk_id_evaluacion', 'evaluacion_tbl', true, 'id_evaluacion', ["nombre_evaluacion","","",""], '', '', [], [], [], [], [], [], '`nombre_evaluacion`', '', "`nombre_evaluacion`");
                 break;
             default:
-                $this->fk_id_evaluacion->Lookup = new Lookup('fk_id_evaluacion', 'evaluacion_tbl', false, 'id_evaluacion', ["nombre_evaluacion","","",""], '', '', [], [], [], [], [], [], '`nombre_evaluacion`', '', "`nombre_evaluacion`");
+                $this->fk_id_evaluacion->Lookup = new Lookup('fk_id_evaluacion', 'evaluacion_tbl', true, 'id_evaluacion', ["nombre_evaluacion","","",""], '', '', [], [], [], [], [], [], '`nombre_evaluacion`', '', "`nombre_evaluacion`");
                 break;
         }
         $this->fk_id_evaluacion->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -346,14 +347,6 @@ class CalificacionTbl extends DbTable
     {
         // Master filter
         $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "alumnotbl") {
-            $masterTable = Container("alumnotbl");
-            if ($this->fk_id_alumno->getSessionValue() != "") {
-                $masterFilter .= "" . GetKeyFilter($masterTable->id_alumno, $this->fk_id_alumno->getSessionValue(), $masterTable->id_alumno->DataType, $masterTable->Dbid);
-            } else {
-                return "";
-            }
-        }
         if ($this->getCurrentMasterTable() == "asignatura_tbl") {
             $masterTable = Container("asignatura_tbl");
             if ($this->fk_id_asignatura->getSessionValue() != "") {
@@ -370,14 +363,6 @@ class CalificacionTbl extends DbTable
     {
         // Detail filter
         $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "alumnotbl") {
-            $masterTable = Container("alumnotbl");
-            if ($this->fk_id_alumno->getSessionValue() != "") {
-                $detailFilter .= "" . GetKeyFilter($this->fk_id_alumno, $this->fk_id_alumno->getSessionValue(), $masterTable->id_alumno->DataType, $this->Dbid);
-            } else {
-                return "";
-            }
-        }
         if ($this->getCurrentMasterTable() == "asignatura_tbl") {
             $masterTable = Container("asignatura_tbl");
             if ($this->fk_id_asignatura->getSessionValue() != "") {
@@ -400,20 +385,6 @@ class CalificacionTbl extends DbTable
     {
         $validKeys = true;
         switch ($masterTable->TableVar) {
-            case "alumnotbl":
-                $key = $keys["fk_id_alumno"] ?? "";
-                if (EmptyValue($key)) {
-                    if ($masterTable->id_alumno->Required) { // Required field and empty value
-                        return ""; // Return empty filter
-                    }
-                    $validKeys = false;
-                } elseif (!$validKeys) { // Already has empty key
-                    return ""; // Return empty filter
-                }
-                if ($validKeys) {
-                    return GetKeyFilter($masterTable->id_alumno, $keys["fk_id_alumno"], $this->fk_id_alumno->DataType, $this->Dbid);
-                }
-                break;
             case "asignatura_tbl":
                 $key = $keys["fk_id_asignatura"] ?? "";
                 if (EmptyValue($key)) {
@@ -436,8 +407,6 @@ class CalificacionTbl extends DbTable
     public function getDetailFilter($masterTable)
     {
         switch ($masterTable->TableVar) {
-            case "alumnotbl":
-                return GetKeyFilter($this->fk_id_alumno, $masterTable->id_alumno->DbValue, $masterTable->id_alumno->DataType, $masterTable->Dbid);
             case "asignatura_tbl":
                 return GetKeyFilter($this->fk_id_asignatura, $masterTable->id_asignatura->DbValue, $masterTable->id_asignatura->DataType, $masterTable->Dbid);
         }
@@ -550,9 +519,6 @@ class CalificacionTbl extends DbTable
         global $Security;
         // Add User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "alumnotbl" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "alumnotbl"); // Add detail User ID filter
-            }
             if ($this->getCurrentMasterTable() == "asignatura_tbl" || $this->getCurrentMasterTable() == "") {
                 $filter = $this->addDetailUserIDFilter($filter, "asignatura_tbl"); // Add detail User ID filter
             }
@@ -1066,10 +1032,6 @@ class CalificacionTbl extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "alumnotbl" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id_alumno", $this->fk_id_alumno->getSessionValue()); // Use Session Value
-        }
         if ($this->getCurrentMasterTable() == "asignatura_tbl" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
             $url .= "&" . GetForeignKeyUrl("fk_id_asignatura", $this->fk_id_asignatura->getSessionValue()); // Use Session Value
@@ -1434,32 +1396,26 @@ class CalificacionTbl extends DbTable
 
         // fk_id_alumno
         $this->fk_id_alumno->setupEditAttributes();
-        if ($this->fk_id_alumno->getSessionValue() != "") {
-            $this->fk_id_alumno->CurrentValue = GetForeignKeyValue($this->fk_id_alumno->getSessionValue());
-            $curVal = strval($this->fk_id_alumno->CurrentValue);
-            if ($curVal != "") {
-                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCacheImpl($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
-                        $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
-                    } else {
-                        $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
-                    }
-                }
-            } else {
-                $this->fk_id_alumno->ViewValue = null;
-            }
+        $curVal = trim(strval($this->fk_id_alumno->CurrentValue));
+        if ($curVal != "") {
+            $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
         } else {
-            $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
+            $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->Lookup !== null && is_array($this->fk_id_alumno->lookupOptions()) ? $curVal : null;
         }
+        if ($this->fk_id_alumno->ViewValue !== null) { // Load from cache
+            $this->fk_id_alumno->EditValue = array_values($this->fk_id_alumno->lookupOptions());
+        } else { // Lookup from database
+            $filterWrk = "";
+            $sqlWrk = $this->fk_id_alumno->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+            $conn = Conn();
+            $config = $conn->getConfiguration();
+            $config->setResultCacheImpl($this->Cache);
+            $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+            $ari = count($rswrk);
+            $arwrk = $rswrk;
+            $this->fk_id_alumno->EditValue = $arwrk;
+        }
+        $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
 
         // nota_calificacion
         $this->nota_calificacion->setupEditAttributes();
@@ -1476,6 +1432,25 @@ class CalificacionTbl extends DbTable
 
         // fk_id_evaluacion
         $this->fk_id_evaluacion->setupEditAttributes();
+        $curVal = trim(strval($this->fk_id_evaluacion->CurrentValue));
+        if ($curVal != "") {
+            $this->fk_id_evaluacion->ViewValue = $this->fk_id_evaluacion->lookupCacheOption($curVal);
+        } else {
+            $this->fk_id_evaluacion->ViewValue = $this->fk_id_evaluacion->Lookup !== null && is_array($this->fk_id_evaluacion->lookupOptions()) ? $curVal : null;
+        }
+        if ($this->fk_id_evaluacion->ViewValue !== null) { // Load from cache
+            $this->fk_id_evaluacion->EditValue = array_values($this->fk_id_evaluacion->lookupOptions());
+        } else { // Lookup from database
+            $filterWrk = "";
+            $sqlWrk = $this->fk_id_evaluacion->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+            $conn = Conn();
+            $config = $conn->getConfiguration();
+            $config->setResultCacheImpl($this->Cache);
+            $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+            $ari = count($rswrk);
+            $arwrk = $rswrk;
+            $this->fk_id_evaluacion->EditValue = $arwrk;
+        }
         $this->fk_id_evaluacion->PlaceHolder = RemoveHtml($this->fk_id_evaluacion->caption());
 
         // Call Row Rendered event
@@ -1654,16 +1629,15 @@ class CalificacionTbl extends DbTable
     // Row Inserting event
     public function rowInserting($rsold, &$rsnew)
     {
-    /* $AlumnoCursaMateria = ExecuteScalar("SELECT count(*) FROM alumnos_asignatura_tbl WHERE fk_id_alumno=$rsnew[fk_id_alumno] AND fk_id_asignatura=$rsnew[fk_id_asignatura]");
-        if($AlumnoCursaMateria>0){
-            return true;
+    $ya_existe = ExecuteScalar("SELECT count(*) FROM calificacion_tbl WHERE fk_id_alumno=$rsnew[fk_id_alumno] AND fk_id_evaluacion=$rsnew[fk_id_evaluacion] AND fk_id_asignatura=$rsnew[fk_id_asignatura]");
+        if($ya_existe>=1){
+            $this->CancelMessage = "Ya ingreso la calificacion de esta evaluación para este alumno";
+            return false;
         }
         else
-        {
-            $this->CancelMessage = "El alumno no cursa esa materia actualmente";
-            return false; 
-        }  */
-        return true;
+        {        
+            return true; 
+        } 
     }
 
     // Row Inserted event

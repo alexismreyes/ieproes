@@ -1058,8 +1058,8 @@ class AlumnotblAdd extends Alumnotbl
 
         // Validate detail grid
         $detailTblVar = explode(",", $this->getCurrentDetailTable());
-        $detailPage = Container("CalificacionTblGrid");
-        if (in_array("calificacion_tbl", $detailTblVar) && $detailPage->DetailAdd) {
+        $detailPage = Container("AlumnosAsignaturaTblGrid");
+        if (in_array("alumnos_asignatura_tbl", $detailTblVar) && $detailPage->DetailAdd) {
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
 
@@ -1139,10 +1139,10 @@ class AlumnotblAdd extends Alumnotbl
         // Add detail records
         if ($addRow) {
             $detailTblVar = explode(",", $this->getCurrentDetailTable());
-            $detailPage = Container("CalificacionTblGrid");
-            if (in_array("calificacion_tbl", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage = Container("AlumnosAsignaturaTblGrid");
+            if (in_array("alumnos_asignatura_tbl", $detailTblVar) && $detailPage->DetailAdd) {
                 $detailPage->fk_id_alumno->setSessionValue($this->id_alumno->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "calificacion_tbl"); // Load user level of detail table
+                $Security->loadCurrentUserLevel($this->ProjectID . "alumnos_asignatura_tbl"); // Load user level of detail table
                 $addRow = $detailPage->gridInsert();
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 if (!$addRow) {
@@ -1189,8 +1189,8 @@ class AlumnotblAdd extends Alumnotbl
         }
         if ($detailTblVar != "") {
             $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("calificacion_tbl", $detailTblVar)) {
-                $detailPageObj = Container("CalificacionTblGrid");
+            if (in_array("alumnos_asignatura_tbl", $detailTblVar)) {
+                $detailPageObj = Container("AlumnosAsignaturaTblGrid");
                 if ($detailPageObj->DetailAdd) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     if ($this->CopyRecord) {
@@ -1206,7 +1206,6 @@ class AlumnotblAdd extends Alumnotbl
                     $detailPageObj->fk_id_alumno->IsDetailKey = true;
                     $detailPageObj->fk_id_alumno->CurrentValue = $this->id_alumno->CurrentValue;
                     $detailPageObj->fk_id_alumno->setSessionValue($detailPageObj->fk_id_alumno->CurrentValue);
-                    $detailPageObj->fk_id_asignatura->setSessionValue(""); // Clear session key
                 }
             }
         }

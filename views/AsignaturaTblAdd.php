@@ -166,14 +166,6 @@ loadjs.ready("fasignatura_tbladd", function() {
 <?php } ?>
 <?php include_once "CalificacionTblGrid.php" ?>
 <?php } ?>
-<?php
-    if (in_array("alumnos_asignatura_tbl", explode(",", $Page->getCurrentDetailTable())) && $alumnos_asignatura_tbl->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("alumnos_asignatura_tbl", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "AlumnosAsignaturaTblGrid.php" ?>
-<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fasignatura_tbladd"><?= $Language->phrase("AddBtn") ?></button>

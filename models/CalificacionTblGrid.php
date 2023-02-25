@@ -660,31 +660,12 @@ class CalificacionTblGrid extends CalificacionTbl
 
         // Add master User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-                if ($this->getCurrentMasterTable() == "alumnotbl") {
-                    $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "alumnotbl"); // Add master User ID filter
-                }
                 if ($this->getCurrentMasterTable() == "asignatura_tbl") {
                     $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "asignatura_tbl"); // Add master User ID filter
                 }
         }
         AddFilter($filter, $this->DbDetailFilter);
         AddFilter($filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "alumnotbl") {
-            $masterTbl = Container("alumnotbl");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("AlumnotblList"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Load master record
         if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "asignatura_tbl") {
@@ -1214,7 +1195,6 @@ class CalificacionTblGrid extends CalificacionTbl
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->fk_id_alumno->setSessionValue("");
                         $this->fk_id_asignatura->setSessionValue("");
             }
 
@@ -1970,56 +1950,30 @@ class CalificacionTblGrid extends CalificacionTbl
 
             // fk_id_alumno
             $this->fk_id_alumno->setupEditAttributes();
-            if ($this->fk_id_alumno->getSessionValue() != "") {
-                $this->fk_id_alumno->CurrentValue = GetForeignKeyValue($this->fk_id_alumno->getSessionValue());
-                $this->fk_id_alumno->OldValue = $this->fk_id_alumno->CurrentValue;
-                $curVal = strval($this->fk_id_alumno->CurrentValue);
-                if ($curVal != "") {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                    if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCacheImpl($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
-                            $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
-                        } else {
-                            $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->fk_id_alumno->ViewValue = null;
-                }
+            $curVal = trim(strval($this->fk_id_alumno->CurrentValue));
+            if ($curVal != "") {
+                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->fk_id_alumno->CurrentValue));
-                if ($curVal != "") {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                } else {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->Lookup !== null && is_array($this->fk_id_alumno->lookupOptions()) ? $curVal : null;
-                }
-                if ($this->fk_id_alumno->ViewValue !== null) { // Load from cache
-                    $this->fk_id_alumno->EditValue = array_values($this->fk_id_alumno->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter("`id_alumno`", "=", $this->fk_id_alumno->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->fk_id_alumno->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCacheImpl($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->fk_id_alumno->EditValue = $arwrk;
-                }
-                $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
+                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->Lookup !== null && is_array($this->fk_id_alumno->lookupOptions()) ? $curVal : null;
             }
+            if ($this->fk_id_alumno->ViewValue !== null) { // Load from cache
+                $this->fk_id_alumno->EditValue = array_values($this->fk_id_alumno->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter("`id_alumno`", "=", $this->fk_id_alumno->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->fk_id_alumno->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCacheImpl($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->fk_id_alumno->EditValue = $arwrk;
+            }
+            $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
 
             // nota_calificacion
             $this->nota_calificacion->setupEditAttributes();
@@ -2133,56 +2087,30 @@ class CalificacionTblGrid extends CalificacionTbl
 
             // fk_id_alumno
             $this->fk_id_alumno->setupEditAttributes();
-            if ($this->fk_id_alumno->getSessionValue() != "") {
-                $this->fk_id_alumno->CurrentValue = GetForeignKeyValue($this->fk_id_alumno->getSessionValue());
-                $this->fk_id_alumno->OldValue = $this->fk_id_alumno->CurrentValue;
-                $curVal = strval($this->fk_id_alumno->CurrentValue);
-                if ($curVal != "") {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                    if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCacheImpl($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
-                            $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
-                        } else {
-                            $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->fk_id_alumno->ViewValue = null;
-                }
+            $curVal = trim(strval($this->fk_id_alumno->CurrentValue));
+            if ($curVal != "") {
+                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->fk_id_alumno->CurrentValue));
-                if ($curVal != "") {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                } else {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->Lookup !== null && is_array($this->fk_id_alumno->lookupOptions()) ? $curVal : null;
-                }
-                if ($this->fk_id_alumno->ViewValue !== null) { // Load from cache
-                    $this->fk_id_alumno->EditValue = array_values($this->fk_id_alumno->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter("`id_alumno`", "=", $this->fk_id_alumno->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->fk_id_alumno->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCacheImpl($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->fk_id_alumno->EditValue = $arwrk;
-                }
-                $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
+                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->Lookup !== null && is_array($this->fk_id_alumno->lookupOptions()) ? $curVal : null;
             }
+            if ($this->fk_id_alumno->ViewValue !== null) { // Load from cache
+                $this->fk_id_alumno->EditValue = array_values($this->fk_id_alumno->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter("`id_alumno`", "=", $this->fk_id_alumno->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->fk_id_alumno->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCacheImpl($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->fk_id_alumno->EditValue = $arwrk;
+            }
+            $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
 
             // nota_calificacion
             $this->nota_calificacion->setupEditAttributes();
@@ -2397,9 +2325,6 @@ class CalificacionTblGrid extends CalificacionTbl
         $this->fk_id_asignatura->setDbValueDef($rsnew, $this->fk_id_asignatura->CurrentValue, 0, $this->fk_id_asignatura->ReadOnly);
 
         // fk_id_alumno
-        if ($this->fk_id_alumno->getSessionValue() != "") {
-            $this->fk_id_alumno->ReadOnly = true;
-        }
         $this->fk_id_alumno->setDbValueDef($rsnew, $this->fk_id_alumno->CurrentValue, 0, $this->fk_id_alumno->ReadOnly);
 
         // nota_calificacion
@@ -2414,11 +2339,11 @@ class CalificacionTblGrid extends CalificacionTbl
         // Update current values
         $this->setCurrentValues($rsnew);
 
-        // Check referential integrity for master table 'alumnotbl'
+        // Check referential integrity for master table 'asignatura_tbl'
         $detailKeys = [];
-        $keyValue = $rsnew['fk_id_alumno'] ?? $rsold['fk_id_alumno'];
-        $detailKeys['fk_id_alumno'] = $keyValue;
-        $masterTable = Container("alumnotbl");
+        $keyValue = $rsnew['fk_id_asignatura'] ?? $rsold['fk_id_asignatura'];
+        $detailKeys['fk_id_asignatura'] = $keyValue;
+        $masterTable = Container("asignatura_tbl");
         $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
         if (!EmptyValue($masterFilter)) {
             $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
@@ -2427,7 +2352,7 @@ class CalificacionTblGrid extends CalificacionTbl
             $validMasterRecord = $masterFilter === null;
         }
         if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "alumnotbl", $Language->phrase("RelatedRecordRequired"));
+            $relatedRecordMsg = str_replace("%t", "asignatura_tbl", $Language->phrase("RelatedRecordRequired"));
             $this->setFailureMessage($relatedRecordMsg);
             return false;
         }
@@ -2471,9 +2396,6 @@ class CalificacionTblGrid extends CalificacionTbl
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "alumnotbl") {
-            $this->fk_id_alumno->CurrentValue = $this->fk_id_alumno->getSessionValue();
-        }
         if ($this->getCurrentMasterTable() == "asignatura_tbl") {
             $this->fk_id_asignatura->CurrentValue = $this->fk_id_asignatura->getSessionValue();
         }
@@ -2524,8 +2446,8 @@ class CalificacionTblGrid extends CalificacionTbl
         // Check referential integrity for master table 'calificacion_tbl'
         $validMasterRecord = true;
         $detailKeys = [];
-        $detailKeys["fk_id_alumno"] = $this->fk_id_alumno->CurrentValue;
-        $masterTable = Container("alumnotbl");
+        $detailKeys["fk_id_asignatura"] = $this->fk_id_asignatura->CurrentValue;
+        $masterTable = Container("asignatura_tbl");
         $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
         if (!EmptyValue($masterFilter)) {
             $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
@@ -2534,7 +2456,7 @@ class CalificacionTblGrid extends CalificacionTbl
             $validMasterRecord = $masterFilter === null;
         }
         if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "alumnotbl", $Language->phrase("RelatedRecordRequired"));
+            $relatedRecordMsg = str_replace("%t", "asignatura_tbl", $Language->phrase("RelatedRecordRequired"));
             $this->setFailureMessage($relatedRecordMsg);
             return false;
         }
@@ -2574,13 +2496,6 @@ class CalificacionTblGrid extends CalificacionTbl
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "alumnotbl") {
-            $masterTbl = Container("alumnotbl");
-            $this->fk_id_alumno->Visible = false;
-            if ($masterTbl->EventCancelled) {
-                $this->EventCancelled = true;
-            }
-        }
         if ($masterTblVar == "asignatura_tbl") {
             $masterTbl = Container("asignatura_tbl");
             if ($masterTbl->EventCancelled) {

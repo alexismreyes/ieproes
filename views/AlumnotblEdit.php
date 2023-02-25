@@ -211,12 +211,12 @@ loadjs.ready(["falumnotbledit", "datetimepicker"], function () {
 </div><!-- /page* -->
     <input type="hidden" data-table="alumnotbl" data-field="x_id_alumno" data-hidden="1" name="x_id_alumno" id="x_id_alumno" value="<?= HtmlEncode($Page->id_alumno->CurrentValue) ?>">
 <?php
-    if (in_array("calificacion_tbl", explode(",", $Page->getCurrentDetailTable())) && $calificacion_tbl->DetailEdit) {
+    if (in_array("alumnos_asignatura_tbl", explode(",", $Page->getCurrentDetailTable())) && $alumnos_asignatura_tbl->DetailEdit) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("calificacion_tbl", "TblCaption") ?></h4>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("alumnos_asignatura_tbl", "TblCaption") ?></h4>
 <?php } ?>
-<?php include_once "CalificacionTblGrid.php" ?>
+<?php include_once "AlumnosAsignaturaTblGrid.php" ?>
 <?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->

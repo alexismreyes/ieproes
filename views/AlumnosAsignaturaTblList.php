@@ -46,9 +46,9 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "asignatura_tbl") {
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "alumnotbl") {
     if ($Page->MasterRecordExists) {
-        include_once "views/AsignaturaTblMaster.php";
+        include_once "views/AlumnotblMaster.php";
     }
 }
 ?>
@@ -72,9 +72,9 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($Page->getCurrentMasterTable() == "asignatura_tbl" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="asignatura_tbl">
-<input type="hidden" name="fk_id_asignatura" value="<?= HtmlEncode($Page->fk_id_asignatura->getSessionValue()) ?>">
+<?php if ($Page->getCurrentMasterTable() == "alumnotbl" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="alumnotbl">
+<input type="hidden" name="fk_id_alumno" value="<?= HtmlEncode($Page->fk_id_alumno->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_alumnos_asignatura_tbl" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
@@ -93,9 +93,6 @@ $Page->ListOptions->render("header", "left");
 ?>
 <?php if ($Page->fk_id_asignatura->Visible) { // fk_id_asignatura ?>
         <th data-name="fk_id_asignatura" class="<?= $Page->fk_id_asignatura->headerCellClass() ?>"><div id="elh_alumnos_asignatura_tbl_fk_id_asignatura" class="alumnos_asignatura_tbl_fk_id_asignatura"><?= $Page->renderFieldHeader($Page->fk_id_asignatura) ?></div></th>
-<?php } ?>
-<?php if ($Page->fk_id_alumno->Visible) { // fk_id_alumno ?>
-        <th data-name="fk_id_alumno" class="<?= $Page->fk_id_alumno->headerCellClass() ?>"><div id="elh_alumnos_asignatura_tbl_fk_id_alumno" class="alumnos_asignatura_tbl_fk_id_alumno"><?= $Page->renderFieldHeader($Page->fk_id_alumno) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -121,14 +118,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_alumnos_asignatura_tbl_fk_id_asignatura" class="el_alumnos_asignatura_tbl_fk_id_asignatura">
 <span<?= $Page->fk_id_asignatura->viewAttributes() ?>>
 <?= $Page->fk_id_asignatura->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->fk_id_alumno->Visible) { // fk_id_alumno ?>
-        <td data-name="fk_id_alumno"<?= $Page->fk_id_alumno->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_alumnos_asignatura_tbl_fk_id_alumno" class="el_alumnos_asignatura_tbl_fk_id_alumno">
-<span<?= $Page->fk_id_alumno->viewAttributes() ?>>
-<?= $Page->fk_id_alumno->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

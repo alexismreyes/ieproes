@@ -53,17 +53,6 @@ loadjs.ready(["wrapper", "head"], function () {
 <input type="hidden" name="t" value="alumnos_asignatura_tbl">
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <table class="<?= $Page->TableClass ?>">
-<?php if ($Page->fk_id_asignatura->Visible) { // fk_id_asignatura ?>
-    <tr id="r_fk_id_asignatura"<?= $Page->fk_id_asignatura->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_alumnos_asignatura_tbl_fk_id_asignatura"><?= $Page->fk_id_asignatura->caption() ?></span></td>
-        <td data-name="fk_id_asignatura"<?= $Page->fk_id_asignatura->cellAttributes() ?>>
-<span id="el_alumnos_asignatura_tbl_fk_id_asignatura">
-<span<?= $Page->fk_id_asignatura->viewAttributes() ?>>
-<?= $Page->fk_id_asignatura->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->fk_id_alumno->Visible) { // fk_id_alumno ?>
     <tr id="r_fk_id_alumno"<?= $Page->fk_id_alumno->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_alumnos_asignatura_tbl_fk_id_alumno"><?= $Page->fk_id_alumno->caption() ?></span></td>
@@ -71,6 +60,17 @@ loadjs.ready(["wrapper", "head"], function () {
 <span id="el_alumnos_asignatura_tbl_fk_id_alumno">
 <span<?= $Page->fk_id_alumno->viewAttributes() ?>>
 <?= $Page->fk_id_alumno->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->fk_id_asignatura->Visible) { // fk_id_asignatura ?>
+    <tr id="r_fk_id_asignatura"<?= $Page->fk_id_asignatura->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_alumnos_asignatura_tbl_fk_id_asignatura"><?= $Page->fk_id_asignatura->caption() ?></span></td>
+        <td data-name="fk_id_asignatura"<?= $Page->fk_id_asignatura->cellAttributes() ?>>
+<span id="el_alumnos_asignatura_tbl_fk_id_asignatura">
+<span<?= $Page->fk_id_asignatura->viewAttributes() ?>>
+<?= $Page->fk_id_asignatura->getViewValue() ?></span>
 </span>
 </td>
     </tr>

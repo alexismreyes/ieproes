@@ -53,9 +53,6 @@ $Page->showMessage();
 <?php if ($Page->fk_id_asignatura->Visible) { // fk_id_asignatura ?>
         <th class="<?= $Page->fk_id_asignatura->headerCellClass() ?>"><span id="elh_alumnos_asignatura_tbl_fk_id_asignatura" class="alumnos_asignatura_tbl_fk_id_asignatura"><?= $Page->fk_id_asignatura->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->fk_id_alumno->Visible) { // fk_id_alumno ?>
-        <th class="<?= $Page->fk_id_alumno->headerCellClass() ?>"><span id="elh_alumnos_asignatura_tbl_fk_id_alumno" class="alumnos_asignatura_tbl_fk_id_alumno"><?= $Page->fk_id_alumno->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -82,14 +79,6 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_alumnos_asignatura_tbl_fk_id_asignatura" class="el_alumnos_asignatura_tbl_fk_id_asignatura">
 <span<?= $Page->fk_id_asignatura->viewAttributes() ?>>
 <?= $Page->fk_id_asignatura->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->fk_id_alumno->Visible) { // fk_id_alumno ?>
-        <td<?= $Page->fk_id_alumno->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_alumnos_asignatura_tbl_fk_id_alumno" class="el_alumnos_asignatura_tbl_fk_id_alumno">
-<span<?= $Page->fk_id_alumno->viewAttributes() ?>>
-<?= $Page->fk_id_alumno->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

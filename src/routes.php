@@ -56,7 +56,6 @@ return function (App $app) {
     // usuarios_tbl
     $app->map(["GET","POST","OPTIONS"], '/UsuariosTblList[/{id_usuario}]', UsuariosTblController::class . ':list')->add(PermissionMiddleware::class)->setName('UsuariosTblList-usuarios_tbl-list'); // list
     $app->map(["GET","POST","OPTIONS"], '/UsuariosTblAdd[/{id_usuario}]', UsuariosTblController::class . ':add')->add(PermissionMiddleware::class)->setName('UsuariosTblAdd-usuarios_tbl-add'); // add
-    $app->map(["GET","POST","OPTIONS"], '/UsuariosTblView[/{id_usuario}]', UsuariosTblController::class . ':view')->add(PermissionMiddleware::class)->setName('UsuariosTblView-usuarios_tbl-view'); // view
     $app->map(["GET","POST","OPTIONS"], '/UsuariosTblEdit[/{id_usuario}]', UsuariosTblController::class . ':edit')->add(PermissionMiddleware::class)->setName('UsuariosTblEdit-usuarios_tbl-edit'); // edit
     $app->map(["GET","POST","OPTIONS"], '/UsuariosTblDelete[/{id_usuario}]', UsuariosTblController::class . ':delete')->add(PermissionMiddleware::class)->setName('UsuariosTblDelete-usuarios_tbl-delete'); // delete
     $app->group(
@@ -64,7 +63,6 @@ return function (App $app) {
         function (RouteCollectorProxy $group) {
             $group->map(["GET","POST","OPTIONS"], '/' . Config('LIST_ACTION') . '[/{id_usuario}]', UsuariosTblController::class . ':list')->add(PermissionMiddleware::class)->setName('usuarios_tbl/list-usuarios_tbl-list-2'); // list
             $group->map(["GET","POST","OPTIONS"], '/' . Config('ADD_ACTION') . '[/{id_usuario}]', UsuariosTblController::class . ':add')->add(PermissionMiddleware::class)->setName('usuarios_tbl/add-usuarios_tbl-add-2'); // add
-            $group->map(["GET","POST","OPTIONS"], '/' . Config('VIEW_ACTION') . '[/{id_usuario}]', UsuariosTblController::class . ':view')->add(PermissionMiddleware::class)->setName('usuarios_tbl/view-usuarios_tbl-view-2'); // view
             $group->map(["GET","POST","OPTIONS"], '/' . Config('EDIT_ACTION') . '[/{id_usuario}]', UsuariosTblController::class . ':edit')->add(PermissionMiddleware::class)->setName('usuarios_tbl/edit-usuarios_tbl-edit-2'); // edit
             $group->map(["GET","POST","OPTIONS"], '/' . Config('DELETE_ACTION') . '[/{id_usuario}]', UsuariosTblController::class . ':delete')->add(PermissionMiddleware::class)->setName('usuarios_tbl/delete-usuarios_tbl-delete-2'); // delete
         }
@@ -105,16 +103,12 @@ return function (App $app) {
     // alumnos_asignatura_tbl
     $app->map(["GET","POST","OPTIONS"], '/AlumnosAsignaturaTblList[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':list')->add(PermissionMiddleware::class)->setName('AlumnosAsignaturaTblList-alumnos_asignatura_tbl-list'); // list
     $app->map(["GET","POST","OPTIONS"], '/AlumnosAsignaturaTblAdd[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':add')->add(PermissionMiddleware::class)->setName('AlumnosAsignaturaTblAdd-alumnos_asignatura_tbl-add'); // add
-    $app->map(["GET","POST","OPTIONS"], '/AlumnosAsignaturaTblView[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':view')->add(PermissionMiddleware::class)->setName('AlumnosAsignaturaTblView-alumnos_asignatura_tbl-view'); // view
-    $app->map(["GET","POST","OPTIONS"], '/AlumnosAsignaturaTblEdit[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':edit')->add(PermissionMiddleware::class)->setName('AlumnosAsignaturaTblEdit-alumnos_asignatura_tbl-edit'); // edit
     $app->map(["GET","POST","OPTIONS"], '/AlumnosAsignaturaTblDelete[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':delete')->add(PermissionMiddleware::class)->setName('AlumnosAsignaturaTblDelete-alumnos_asignatura_tbl-delete'); // delete
     $app->group(
         '/alumnos_asignatura_tbl',
         function (RouteCollectorProxy $group) {
             $group->map(["GET","POST","OPTIONS"], '/' . Config('LIST_ACTION') . '[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':list')->add(PermissionMiddleware::class)->setName('alumnos_asignatura_tbl/list-alumnos_asignatura_tbl-list-2'); // list
             $group->map(["GET","POST","OPTIONS"], '/' . Config('ADD_ACTION') . '[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':add')->add(PermissionMiddleware::class)->setName('alumnos_asignatura_tbl/add-alumnos_asignatura_tbl-add-2'); // add
-            $group->map(["GET","POST","OPTIONS"], '/' . Config('VIEW_ACTION') . '[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':view')->add(PermissionMiddleware::class)->setName('alumnos_asignatura_tbl/view-alumnos_asignatura_tbl-view-2'); // view
-            $group->map(["GET","POST","OPTIONS"], '/' . Config('EDIT_ACTION') . '[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':edit')->add(PermissionMiddleware::class)->setName('alumnos_asignatura_tbl/edit-alumnos_asignatura_tbl-edit-2'); // edit
             $group->map(["GET","POST","OPTIONS"], '/' . Config('DELETE_ACTION') . '[/{id_alumnosasignatura}]', AlumnosAsignaturaTblController::class . ':delete')->add(PermissionMiddleware::class)->setName('alumnos_asignatura_tbl/delete-alumnos_asignatura_tbl-delete-2'); // delete
         }
     );
@@ -144,6 +138,15 @@ return function (App $app) {
             $group->map(["GET","POST","OPTIONS"], '/' . Config('VIEW_ACTION') . '[/{id_evaluacion}]', EvaluacionTblController::class . ':view')->add(PermissionMiddleware::class)->setName('evaluacion_tbl/view-evaluacion_tbl-view-2'); // view
             $group->map(["GET","POST","OPTIONS"], '/' . Config('EDIT_ACTION') . '[/{id_evaluacion}]', EvaluacionTblController::class . ':edit')->add(PermissionMiddleware::class)->setName('evaluacion_tbl/edit-evaluacion_tbl-edit-2'); // edit
             $group->map(["GET","POST","OPTIONS"], '/' . Config('DELETE_ACTION') . '[/{id_evaluacion}]', EvaluacionTblController::class . ':delete')->add(PermissionMiddleware::class)->setName('evaluacion_tbl/delete-evaluacion_tbl-delete-2'); // delete
+        }
+    );
+
+    // asignaturas_vw
+    $app->map(["GET","POST","OPTIONS"], '/AsignaturasVwList[/{id_asignatura}]', AsignaturasVwController::class . ':list')->add(PermissionMiddleware::class)->setName('AsignaturasVwList-asignaturas_vw-list'); // list
+    $app->group(
+        '/asignaturas_vw',
+        function (RouteCollectorProxy $group) {
+            $group->map(["GET","POST","OPTIONS"], '/' . Config('LIST_ACTION') . '[/{id_asignatura}]', AsignaturasVwController::class . ':list')->add(PermissionMiddleware::class)->setName('asignaturas_vw/list-asignaturas_vw-list-2'); // list
         }
     );
 

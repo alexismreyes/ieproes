@@ -979,55 +979,30 @@ class CalificacionTblAdd extends CalificacionTbl
 
             // fk_id_alumno
             $this->fk_id_alumno->setupEditAttributes();
-            if ($this->fk_id_alumno->getSessionValue() != "") {
-                $this->fk_id_alumno->CurrentValue = GetForeignKeyValue($this->fk_id_alumno->getSessionValue());
-                $curVal = strval($this->fk_id_alumno->CurrentValue);
-                if ($curVal != "") {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                    if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCacheImpl($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
-                            $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
-                        } else {
-                            $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->fk_id_alumno->ViewValue = null;
-                }
+            $curVal = trim(strval($this->fk_id_alumno->CurrentValue));
+            if ($curVal != "") {
+                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->fk_id_alumno->CurrentValue));
-                if ($curVal != "") {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                } else {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->Lookup !== null && is_array($this->fk_id_alumno->lookupOptions()) ? $curVal : null;
-                }
-                if ($this->fk_id_alumno->ViewValue !== null) { // Load from cache
-                    $this->fk_id_alumno->EditValue = array_values($this->fk_id_alumno->lookupOptions());
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = SearchFilter("`id_alumno`", "=", $this->fk_id_alumno->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->fk_id_alumno->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCacheImpl($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->fk_id_alumno->EditValue = $arwrk;
-                }
-                $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
+                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->Lookup !== null && is_array($this->fk_id_alumno->lookupOptions()) ? $curVal : null;
             }
+            if ($this->fk_id_alumno->ViewValue !== null) { // Load from cache
+                $this->fk_id_alumno->EditValue = array_values($this->fk_id_alumno->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter("`id_alumno`", "=", $this->fk_id_alumno->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->fk_id_alumno->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCacheImpl($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->fk_id_alumno->EditValue = $arwrk;
+            }
+            $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
 
             // nota_calificacion
             $this->nota_calificacion->setupEditAttributes();
@@ -1195,8 +1170,8 @@ class CalificacionTblAdd extends CalificacionTbl
         // Check referential integrity for master table 'calificacion_tbl'
         $validMasterRecord = true;
         $detailKeys = [];
-        $detailKeys["fk_id_alumno"] = $this->fk_id_alumno->CurrentValue;
-        $masterTable = Container("alumnotbl");
+        $detailKeys["fk_id_asignatura"] = $this->fk_id_asignatura->CurrentValue;
+        $masterTable = Container("asignatura_tbl");
         $masterFilter = $this->getMasterFilter($masterTable, $detailKeys);
         if (!EmptyValue($masterFilter)) {
             $rsmaster = $masterTable->loadRs($masterFilter)->fetch();
@@ -1205,7 +1180,7 @@ class CalificacionTblAdd extends CalificacionTbl
             $validMasterRecord = $masterFilter === null;
         }
         if (!$validMasterRecord) {
-            $relatedRecordMsg = str_replace("%t", "alumnotbl", $Language->phrase("RelatedRecordRequired"));
+            $relatedRecordMsg = str_replace("%t", "asignatura_tbl", $Language->phrase("RelatedRecordRequired"));
             $this->setFailureMessage($relatedRecordMsg);
             return false;
         }
@@ -1260,21 +1235,6 @@ class CalificacionTblAdd extends CalificacionTbl
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "alumnotbl") {
-                $validMaster = true;
-                $masterTbl = Container("alumnotbl");
-                if (($parm = Get("fk_id_alumno", Get("fk_id_alumno"))) !== null) {
-                    $masterTbl->id_alumno->setQueryStringValue($parm);
-                    $this->fk_id_alumno->QueryStringValue = $masterTbl->id_alumno->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->fk_id_alumno->setSessionValue($this->fk_id_alumno->QueryStringValue);
-                    $foreignKeys["fk_id_alumno"] = $this->fk_id_alumno->QueryStringValue;
-                    if (!is_numeric($masterTbl->id_alumno->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
             if ($masterTblVar == "asignatura_tbl") {
                 $validMaster = true;
                 $masterTbl = Container("asignatura_tbl");
@@ -1296,21 +1256,6 @@ class CalificacionTblAdd extends CalificacionTbl
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "alumnotbl") {
-                $validMaster = true;
-                $masterTbl = Container("alumnotbl");
-                if (($parm = Post("fk_id_alumno", Post("fk_id_alumno"))) !== null) {
-                    $masterTbl->id_alumno->setFormValue($parm);
-                    $this->fk_id_alumno->FormValue = $masterTbl->id_alumno->FormValue;
-                    $this->fk_id_alumno->setSessionValue($this->fk_id_alumno->FormValue);
-                    $foreignKeys["fk_id_alumno"] = $this->fk_id_alumno->FormValue;
-                    if (!is_numeric($masterTbl->id_alumno->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "asignatura_tbl") {
                 $validMaster = true;
@@ -1339,11 +1284,6 @@ class CalificacionTblAdd extends CalificacionTbl
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "alumnotbl") {
-                if (!array_key_exists("fk_id_alumno", $foreignKeys)) { // Not current foreign key
-                    $this->fk_id_alumno->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "asignatura_tbl") {
                 if (!array_key_exists("fk_id_asignatura", $foreignKeys)) { // Not current foreign key
                     $this->fk_id_asignatura->setSessionValue("");

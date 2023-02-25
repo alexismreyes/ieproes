@@ -835,21 +835,6 @@ class CalificacionTblDelete extends CalificacionTbl
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "alumnotbl") {
-                $validMaster = true;
-                $masterTbl = Container("alumnotbl");
-                if (($parm = Get("fk_id_alumno", Get("fk_id_alumno"))) !== null) {
-                    $masterTbl->id_alumno->setQueryStringValue($parm);
-                    $this->fk_id_alumno->QueryStringValue = $masterTbl->id_alumno->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->fk_id_alumno->setSessionValue($this->fk_id_alumno->QueryStringValue);
-                    $foreignKeys["fk_id_alumno"] = $this->fk_id_alumno->QueryStringValue;
-                    if (!is_numeric($masterTbl->id_alumno->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
             if ($masterTblVar == "asignatura_tbl") {
                 $validMaster = true;
                 $masterTbl = Container("asignatura_tbl");
@@ -871,21 +856,6 @@ class CalificacionTblDelete extends CalificacionTbl
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "alumnotbl") {
-                $validMaster = true;
-                $masterTbl = Container("alumnotbl");
-                if (($parm = Post("fk_id_alumno", Post("fk_id_alumno"))) !== null) {
-                    $masterTbl->id_alumno->setFormValue($parm);
-                    $this->fk_id_alumno->FormValue = $masterTbl->id_alumno->FormValue;
-                    $this->fk_id_alumno->setSessionValue($this->fk_id_alumno->FormValue);
-                    $foreignKeys["fk_id_alumno"] = $this->fk_id_alumno->FormValue;
-                    if (!is_numeric($masterTbl->id_alumno->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "asignatura_tbl") {
                 $validMaster = true;
@@ -914,11 +884,6 @@ class CalificacionTblDelete extends CalificacionTbl
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "alumnotbl") {
-                if (!array_key_exists("fk_id_alumno", $foreignKeys)) { // Not current foreign key
-                    $this->fk_id_alumno->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "asignatura_tbl") {
                 if (!array_key_exists("fk_id_asignatura", $foreignKeys)) { // Not current foreign key
                     $this->fk_id_asignatura->setSessionValue("");

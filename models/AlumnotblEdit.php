@@ -1090,8 +1090,8 @@ class AlumnotblEdit extends Alumnotbl
 
         // Validate detail grid
         $detailTblVar = explode(",", $this->getCurrentDetailTable());
-        $detailPage = Container("CalificacionTblGrid");
-        if (in_array("calificacion_tbl", $detailTblVar) && $detailPage->DetailEdit) {
+        $detailPage = Container("AlumnosAsignaturaTblGrid");
+        if (in_array("alumnos_asignatura_tbl", $detailTblVar) && $detailPage->DetailEdit) {
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
 
@@ -1177,9 +1177,9 @@ class AlumnotblEdit extends Alumnotbl
             // Update detail records
             $detailTblVar = explode(",", $this->getCurrentDetailTable());
             if ($editRow) {
-                $detailPage = Container("CalificacionTblGrid");
-                if (in_array("calificacion_tbl", $detailTblVar) && $detailPage->DetailEdit) {
-                    $Security->loadCurrentUserLevel($this->ProjectID . "calificacion_tbl"); // Load user level of detail table
+                $detailPage = Container("AlumnosAsignaturaTblGrid");
+                if (in_array("alumnos_asignatura_tbl", $detailTblVar) && $detailPage->DetailEdit) {
+                    $Security->loadCurrentUserLevel($this->ProjectID . "alumnos_asignatura_tbl"); // Load user level of detail table
                     $editRow = $detailPage->gridUpdate();
                     $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 }
@@ -1235,8 +1235,8 @@ class AlumnotblEdit extends Alumnotbl
         }
         if ($detailTblVar != "") {
             $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("calificacion_tbl", $detailTblVar)) {
-                $detailPageObj = Container("CalificacionTblGrid");
+            if (in_array("alumnos_asignatura_tbl", $detailTblVar)) {
+                $detailPageObj = Container("AlumnosAsignaturaTblGrid");
                 if ($detailPageObj->DetailEdit) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "edit";
@@ -1248,7 +1248,6 @@ class AlumnotblEdit extends Alumnotbl
                     $detailPageObj->fk_id_alumno->IsDetailKey = true;
                     $detailPageObj->fk_id_alumno->CurrentValue = $this->id_alumno->CurrentValue;
                     $detailPageObj->fk_id_alumno->setSessionValue($detailPageObj->fk_id_alumno->CurrentValue);
-                    $detailPageObj->fk_id_asignatura->setSessionValue(""); // Clear session key
                 }
             }
         }

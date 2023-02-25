@@ -368,8 +368,8 @@ class Alumnotbl extends DbTable
     {
         // Detail url
         $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "calificacion_tbl") {
-            $detailUrl = Container("calificacion_tbl")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+        if ($this->getCurrentDetailTable() == "alumnos_asignatura_tbl") {
+            $detailUrl = Container("alumnos_asignatura_tbl")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id_alumno", $this->id_alumno->CurrentValue);
         }
         if ($detailUrl == "") {
@@ -724,33 +724,6 @@ class Alumnotbl extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
-        // Cascade Update detail table 'calificacion_tbl'
-        $cascadeUpdate = false;
-        $rscascade = [];
-        if ($rsold && (isset($rs['id_alumno']) && $rsold['id_alumno'] != $rs['id_alumno'])) { // Update detail field 'fk_id_alumno'
-            $cascadeUpdate = true;
-            $rscascade['fk_id_alumno'] = $rs['id_alumno'];
-        }
-        if ($cascadeUpdate) {
-            $rswrk = Container("calificacion_tbl")->loadRs("`fk_id_alumno` = " . QuotedValue($rsold['id_alumno'], DATATYPE_NUMBER, 'DB'))->fetchAllAssociative();
-            foreach ($rswrk as $rsdtlold) {
-                $rskey = [];
-                $fldname = 'id_calificacion';
-                $rskey[$fldname] = $rsdtlold[$fldname];
-                $rsdtlnew = array_merge($rsdtlold, $rscascade);
-                // Call Row_Updating event
-                $success = Container("calificacion_tbl")->rowUpdating($rsdtlold, $rsdtlnew);
-                if ($success) {
-                    $success = Container("calificacion_tbl")->update($rscascade, $rskey, $rsdtlold);
-                }
-                if (!$success) {
-                    return false;
-                }
-                // Call Row_Updated event
-                Container("calificacion_tbl")->rowUpdated($rsdtlold, $rsdtlnew);
-            }
-        }
-
         // If no field is updated, execute may return 0. Treat as success
         try {
             $success = $this->updateSql($rs, $where, $curfilter)->execute();
@@ -799,30 +772,6 @@ class Alumnotbl extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
-
-        // Cascade delete detail table 'calificacion_tbl'
-        $dtlrows = Container("calificacion_tbl")->loadRs("`fk_id_alumno` = " . QuotedValue($rs['id_alumno'], DATATYPE_NUMBER, "DB"))->fetchAllAssociative();
-        // Call Row Deleting event
-        foreach ($dtlrows as $dtlrow) {
-            $success = Container("calificacion_tbl")->rowDeleting($dtlrow);
-            if (!$success) {
-                break;
-            }
-        }
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                $success = Container("calificacion_tbl")->delete($dtlrow); // Delete
-                if (!$success) {
-                    break;
-                }
-            }
-        }
-        // Call Row Deleted event
-        if ($success) {
-            foreach ($dtlrows as $dtlrow) {
-                Container("calificacion_tbl")->rowDeleted($dtlrow);
-            }
-        }
         if ($success) {
             try {
                 $success = $this->deleteSql($rs, $where, $curfilter)->execute();

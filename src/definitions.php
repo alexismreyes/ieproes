@@ -45,6 +45,7 @@ return [
     "alumnos_asignatura_tbl" => \DI\create(AlumnosAsignaturaTbl::class),
     "alumnosporasigntura_vw" => \DI\create(AlumnosporasignturaVw::class),
     "evaluacion_tbl" => \DI\create(EvaluacionTbl::class),
+    "asignaturas_vw" => \DI\create(AsignaturasVw::class),
 
     // User table
     "usertable" => \DI\get("usuarios_tbl"),

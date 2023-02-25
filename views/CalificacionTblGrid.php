@@ -225,11 +225,6 @@ loadjs.ready("fcalificacion_tblgrid", function() {
     <?php if ($Grid->fk_id_alumno->Visible) { // fk_id_alumno ?>
         <td data-name="fk_id_alumno"<?= $Grid->fk_id_alumno->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<?php if ($Grid->fk_id_alumno->getSessionValue() != "") { ?>
-<span<?= $Grid->fk_id_alumno->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Grid->fk_id_alumno->getDisplayValue($Grid->fk_id_alumno->ViewValue) ?></span></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_fk_id_alumno" name="x<?= $Grid->RowIndex ?>_fk_id_alumno" value="<?= HtmlEncode($Grid->fk_id_alumno->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_calificacion_tbl_fk_id_alumno" class="el_calificacion_tbl_fk_id_alumno">
     <select
         id="x<?= $Grid->RowIndex ?>_fk_id_alumno"
@@ -262,15 +257,9 @@ loadjs.ready("fcalificacion_tblgrid", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="calificacion_tbl" data-field="x_fk_id_alumno" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_fk_id_alumno" id="o<?= $Grid->RowIndex ?>_fk_id_alumno" value="<?= HtmlEncode($Grid->fk_id_alumno->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($Grid->fk_id_alumno->getSessionValue() != "") { ?>
-<span<?= $Grid->fk_id_alumno->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Grid->fk_id_alumno->getDisplayValue($Grid->fk_id_alumno->ViewValue) ?></span></span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_fk_id_alumno" name="x<?= $Grid->RowIndex ?>_fk_id_alumno" value="<?= HtmlEncode($Grid->fk_id_alumno->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_calificacion_tbl_fk_id_alumno" class="el_calificacion_tbl_fk_id_alumno">
     <select
         id="x<?= $Grid->RowIndex ?>_fk_id_alumno"
@@ -303,7 +292,6 @@ loadjs.ready("fcalificacion_tblgrid", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_calificacion_tbl_fk_id_alumno" class="el_calificacion_tbl_fk_id_alumno">

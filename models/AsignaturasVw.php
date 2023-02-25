@@ -8,9 +8,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
- * Table class for alumnos_asignatura_tbl
+ * Table class for asignaturas_vw
  */
-class AlumnosAsignaturaTbl extends DbTable
+class AsignaturasVw extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -41,9 +41,9 @@ class AlumnosAsignaturaTbl extends DbTable
     public $ModalMultiEdit = false;
 
     // Fields
-    public $id_alumnosasignatura;
-    public $fk_id_alumno;
-    public $fk_id_asignatura;
+    public $id_asignatura;
+    public $nombre_asignatura;
+    public $id_profesor;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -56,14 +56,14 @@ class AlumnosAsignaturaTbl extends DbTable
 
         // Language object
         $Language = Container("language");
-        $this->TableVar = "alumnos_asignatura_tbl";
-        $this->TableName = 'alumnos_asignatura_tbl';
-        $this->TableType = "TABLE";
+        $this->TableVar = "asignaturas_vw";
+        $this->TableName = 'asignaturas_vw';
+        $this->TableType = "VIEW";
         $this->ImportUseTransaction = $this->supportsTransaction() && Config("IMPORT_USE_TRANSACTION");
         $this->UseTransaction = $this->supportsTransaction() && Config("USE_TRANSACTION");
 
         // Update Table
-        $this->UpdateTable = "`alumnos_asignatura_tbl`";
+        $this->UpdateTable = "`asignaturas_vw`";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -90,103 +90,77 @@ class AlumnosAsignaturaTbl extends DbTable
         $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this);
 
-        // id_alumnosasignatura
-        $this->id_alumnosasignatura = new DbField(
+        // id_asignatura
+        $this->id_asignatura = new DbField(
             $this, // Table
-            'x_id_alumnosasignatura', // Variable name
-            'id_alumnosasignatura', // Name
-            '`id_alumnosasignatura`', // Expression
-            '`id_alumnosasignatura`', // Basic search expression
+            'x_id_asignatura', // Variable name
+            'id_asignatura', // Name
+            '`id_asignatura`', // Expression
+            '`id_asignatura`', // Basic search expression
             19, // Type
             10, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`id_alumnosasignatura`', // Virtual expression
+            '`id_asignatura`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'NO' // Edit Tag
         );
-        $this->id_alumnosasignatura->InputTextType = "text";
-        $this->id_alumnosasignatura->IsAutoIncrement = true; // Autoincrement field
-        $this->id_alumnosasignatura->IsPrimaryKey = true; // Primary key field
-        $this->id_alumnosasignatura->Sortable = false; // Allow sort
-        $this->id_alumnosasignatura->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->id_alumnosasignatura->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['id_alumnosasignatura'] = &$this->id_alumnosasignatura;
+        $this->id_asignatura->InputTextType = "text";
+        $this->id_asignatura->IsAutoIncrement = true; // Autoincrement field
+        $this->id_asignatura->IsPrimaryKey = true; // Primary key field
+        $this->id_asignatura->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id_asignatura->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['id_asignatura'] = &$this->id_asignatura;
 
-        // fk_id_alumno
-        $this->fk_id_alumno = new DbField(
+        // nombre_asignatura
+        $this->nombre_asignatura = new DbField(
             $this, // Table
-            'x_fk_id_alumno', // Variable name
-            'fk_id_alumno', // Name
-            '`fk_id_alumno`', // Expression
-            '`fk_id_alumno`', // Basic search expression
-            3, // Type
-            11, // Size
+            'x_nombre_asignatura', // Variable name
+            'nombre_asignatura', // Name
+            '`nombre_asignatura`', // Expression
+            '`nombre_asignatura`', // Basic search expression
+            200, // Type
+            60, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`fk_id_alumno`', // Virtual expression
+            '`nombre_asignatura`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->fk_id_alumno->InputTextType = "text";
-        $this->fk_id_alumno->IsForeignKey = true; // Foreign key field
-        $this->fk_id_alumno->Nullable = false; // NOT NULL field
-        $this->fk_id_alumno->Required = true; // Required field
-        $this->fk_id_alumno->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->fk_id_alumno->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        switch ($CurrentLanguage) {
-            case "en-US":
-                $this->fk_id_alumno->Lookup = new Lookup('fk_id_alumno', 'alumnotbl', false, 'id_alumno', ["nombre_alumno","apellidos_alumno","numcarnet_alumno",""], '', '', [], [], [], [], [], [], '', '', "CONCAT(COALESCE(`nombre_alumno`, ''),'" . ValueSeparator(1, $this->fk_id_alumno) . "',COALESCE(`apellidos_alumno`,''),'" . ValueSeparator(2, $this->fk_id_alumno) . "',COALESCE(`numcarnet_alumno`,''))");
-                break;
-            default:
-                $this->fk_id_alumno->Lookup = new Lookup('fk_id_alumno', 'alumnotbl', false, 'id_alumno', ["nombre_alumno","apellidos_alumno","numcarnet_alumno",""], '', '', [], [], [], [], [], [], '', '', "CONCAT(COALESCE(`nombre_alumno`, ''),'" . ValueSeparator(1, $this->fk_id_alumno) . "',COALESCE(`apellidos_alumno`,''),'" . ValueSeparator(2, $this->fk_id_alumno) . "',COALESCE(`numcarnet_alumno`,''))");
-                break;
-        }
-        $this->fk_id_alumno->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->fk_id_alumno->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['fk_id_alumno'] = &$this->fk_id_alumno;
+        $this->nombre_asignatura->InputTextType = "text";
+        $this->nombre_asignatura->Nullable = false; // NOT NULL field
+        $this->nombre_asignatura->Required = true; // Required field
+        $this->nombre_asignatura->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['nombre_asignatura'] = &$this->nombre_asignatura;
 
-        // fk_id_asignatura
-        $this->fk_id_asignatura = new DbField(
+        // id_profesor
+        $this->id_profesor = new DbField(
             $this, // Table
-            'x_fk_id_asignatura', // Variable name
-            'fk_id_asignatura', // Name
-            '`fk_id_asignatura`', // Expression
-            '`fk_id_asignatura`', // Basic search expression
+            'x_id_profesor', // Variable name
+            'id_profesor', // Name
+            '`id_profesor`', // Expression
+            '`id_profesor`', // Basic search expression
             3, // Type
             11, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`fk_id_asignatura`', // Virtual expression
+            '`id_profesor`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'SELECT' // Edit Tag
+            'TEXT' // Edit Tag
         );
-        $this->fk_id_asignatura->addMethod("getSelectFilter", fn() => (CurrentPageID() == "add" && CurrentUserLevel() != -1) ? "`id_profesor` = '".CurrentUserID()."'" : "");
-        $this->fk_id_asignatura->InputTextType = "text";
-        $this->fk_id_asignatura->Nullable = false; // NOT NULL field
-        $this->fk_id_asignatura->Required = true; // Required field
-        $this->fk_id_asignatura->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->fk_id_asignatura->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        switch ($CurrentLanguage) {
-            case "en-US":
-                $this->fk_id_asignatura->Lookup = new Lookup('fk_id_asignatura', 'asignaturas_vw', false, 'id_asignatura', ["nombre_asignatura","","",""], '', '', [], [], [], [], [], [], '', '', "`nombre_asignatura`");
-                break;
-            default:
-                $this->fk_id_asignatura->Lookup = new Lookup('fk_id_asignatura', 'asignaturas_vw', false, 'id_asignatura', ["nombre_asignatura","","",""], '', '', [], [], [], [], [], [], '', '', "`nombre_asignatura`");
-                break;
-        }
-        $this->fk_id_asignatura->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->fk_id_asignatura->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
-        $this->Fields['fk_id_asignatura'] = &$this->fk_id_asignatura;
+        $this->id_profesor->InputTextType = "text";
+        $this->id_profesor->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id_profesor->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['id_profesor'] = &$this->id_profesor;
 
         // Add Doctrine Cache
         $this->Cache = new ArrayCache();
@@ -246,88 +220,6 @@ class AlumnosAsignaturaTbl extends DbTable
         }
     }
 
-    // Current master table name
-    public function getCurrentMasterTable()
-    {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
-    }
-
-    public function setCurrentMasterTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
-    }
-
-    // Get master WHERE clause from session values
-    public function getMasterFilterFromSession()
-    {
-        // Master filter
-        $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "alumnotbl") {
-            $masterTable = Container("alumnotbl");
-            if ($this->fk_id_alumno->getSessionValue() != "") {
-                $masterFilter .= "" . GetKeyFilter($masterTable->id_alumno, $this->fk_id_alumno->getSessionValue(), $masterTable->id_alumno->DataType, $masterTable->Dbid);
-            } else {
-                return "";
-            }
-        }
-        return $masterFilter;
-    }
-
-    // Get detail WHERE clause from session values
-    public function getDetailFilterFromSession()
-    {
-        // Detail filter
-        $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "alumnotbl") {
-            $masterTable = Container("alumnotbl");
-            if ($this->fk_id_alumno->getSessionValue() != "") {
-                $detailFilter .= "" . GetKeyFilter($this->fk_id_alumno, $this->fk_id_alumno->getSessionValue(), $masterTable->id_alumno->DataType, $this->Dbid);
-            } else {
-                return "";
-            }
-        }
-        return $detailFilter;
-    }
-
-    /**
-     * Get master filter
-     *
-     * @param object $masterTable Master Table
-     * @param array $keys Detail Keys
-     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
-     */
-    public function getMasterFilter($masterTable, $keys)
-    {
-        $validKeys = true;
-        switch ($masterTable->TableVar) {
-            case "alumnotbl":
-                $key = $keys["fk_id_alumno"] ?? "";
-                if (EmptyValue($key)) {
-                    if ($masterTable->id_alumno->Required) { // Required field and empty value
-                        return ""; // Return empty filter
-                    }
-                    $validKeys = false;
-                } elseif (!$validKeys) { // Already has empty key
-                    return ""; // Return empty filter
-                }
-                if ($validKeys) {
-                    return GetKeyFilter($masterTable->id_alumno, $keys["fk_id_alumno"], $this->fk_id_alumno->DataType, $this->Dbid);
-                }
-                break;
-        }
-        return null; // All null values and no required fields
-    }
-
-    // Get detail filter
-    public function getDetailFilter($masterTable)
-    {
-        switch ($masterTable->TableVar) {
-            case "alumnotbl":
-                return GetKeyFilter($this->fk_id_alumno, $masterTable->id_alumno->DbValue, $masterTable->id_alumno->DataType, $masterTable->Dbid);
-        }
-        return "";
-    }
-
     // Render X Axis for chart
     public function renderChartXAxis($chartVar, $chartRow)
     {
@@ -337,7 +229,7 @@ class AlumnosAsignaturaTbl extends DbTable
     // Table level SQL
     public function getSqlFrom() // From
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "`alumnos_asignatura_tbl`";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "`asignaturas_vw`";
     }
 
     public function sqlFrom() // For backward compatibility
@@ -635,8 +527,8 @@ class AlumnosAsignaturaTbl extends DbTable
         }
         if ($success) {
             // Get insert id if necessary
-            $this->id_alumnosasignatura->setDbValue($conn->lastInsertId());
-            $rs['id_alumnosasignatura'] = $this->id_alumnosasignatura->DbValue;
+            $this->id_asignatura->setDbValue($conn->lastInsertId());
+            $rs['id_asignatura'] = $this->id_asignatura->DbValue;
         }
         return $success;
     }
@@ -686,8 +578,8 @@ class AlumnosAsignaturaTbl extends DbTable
 
         // Return auto increment field
         if ($success) {
-            if (!isset($rs['id_alumnosasignatura']) && !EmptyValue($this->id_alumnosasignatura->CurrentValue)) {
-                $rs['id_alumnosasignatura'] = $this->id_alumnosasignatura->CurrentValue;
+            if (!isset($rs['id_asignatura']) && !EmptyValue($this->id_asignatura->CurrentValue)) {
+                $rs['id_asignatura'] = $this->id_asignatura->CurrentValue;
             }
         }
         return $success;
@@ -709,8 +601,8 @@ class AlumnosAsignaturaTbl extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
-            if (array_key_exists('id_alumnosasignatura', $rs)) {
-                AddFilter($where, QuotedName('id_alumnosasignatura', $this->Dbid) . '=' . QuotedValue($rs['id_alumnosasignatura'], $this->id_alumnosasignatura->DataType, $this->Dbid));
+            if (array_key_exists('id_asignatura', $rs)) {
+                AddFilter($where, QuotedName('id_asignatura', $this->Dbid) . '=' . QuotedValue($rs['id_asignatura'], $this->id_asignatura->DataType, $this->Dbid));
             }
         }
         $filter = ($curfilter) ? $this->CurrentFilter : "";
@@ -740,9 +632,9 @@ class AlumnosAsignaturaTbl extends DbTable
         if (!is_array($row)) {
             return;
         }
-        $this->id_alumnosasignatura->DbValue = $row['id_alumnosasignatura'];
-        $this->fk_id_alumno->DbValue = $row['fk_id_alumno'];
-        $this->fk_id_asignatura->DbValue = $row['fk_id_asignatura'];
+        $this->id_asignatura->DbValue = $row['id_asignatura'];
+        $this->nombre_asignatura->DbValue = $row['nombre_asignatura'];
+        $this->id_profesor->DbValue = $row['id_profesor'];
     }
 
     // Delete uploaded files
@@ -754,14 +646,14 @@ class AlumnosAsignaturaTbl extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "`id_alumnosasignatura` = @id_alumnosasignatura@";
+        return "`id_asignatura` = @id_asignatura@";
     }
 
     // Get Key
     public function getKey($current = false)
     {
         $keys = [];
-        $val = $current ? $this->id_alumnosasignatura->CurrentValue : $this->id_alumnosasignatura->OldValue;
+        $val = $current ? $this->id_asignatura->CurrentValue : $this->id_asignatura->OldValue;
         if (EmptyValue($val)) {
             return "";
         } else {
@@ -777,9 +669,9 @@ class AlumnosAsignaturaTbl extends DbTable
         $keys = explode(Config("COMPOSITE_KEY_SEPARATOR"), $this->OldKey);
         if (count($keys) == 1) {
             if ($current) {
-                $this->id_alumnosasignatura->CurrentValue = $keys[0];
+                $this->id_asignatura->CurrentValue = $keys[0];
             } else {
-                $this->id_alumnosasignatura->OldValue = $keys[0];
+                $this->id_asignatura->OldValue = $keys[0];
             }
         }
     }
@@ -789,9 +681,9 @@ class AlumnosAsignaturaTbl extends DbTable
     {
         $keyFilter = $this->sqlKeyFilter();
         if (is_array($row)) {
-            $val = array_key_exists('id_alumnosasignatura', $row) ? $row['id_alumnosasignatura'] : null;
+            $val = array_key_exists('id_asignatura', $row) ? $row['id_asignatura'] : null;
         } else {
-            $val = !EmptyValue($this->id_alumnosasignatura->OldValue) && !$current ? $this->id_alumnosasignatura->OldValue : $this->id_alumnosasignatura->CurrentValue;
+            $val = !EmptyValue($this->id_asignatura->OldValue) && !$current ? $this->id_asignatura->OldValue : $this->id_asignatura->CurrentValue;
         }
         if (!is_numeric($val)) {
             return "0=1"; // Invalid key
@@ -799,7 +691,7 @@ class AlumnosAsignaturaTbl extends DbTable
         if ($val === null) {
             return "0=1"; // Invalid key
         } else {
-            $keyFilter = str_replace("@id_alumnosasignatura@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
+            $keyFilter = str_replace("@id_asignatura@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
         }
         return $keyFilter;
     }
@@ -814,7 +706,7 @@ class AlumnosAsignaturaTbl extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("AlumnosAsignaturaTblList");
+        return $_SESSION[$name] ?? GetUrl("AsignaturasVwList");
     }
 
     // Set return page URL
@@ -827,11 +719,11 @@ class AlumnosAsignaturaTbl extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "AlumnosAsignaturaTblView") {
+        if ($pageName == "AsignaturasVwView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "AlumnosAsignaturaTblEdit") {
+        } elseif ($pageName == "AsignaturasVwEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "AlumnosAsignaturaTblAdd") {
+        } elseif ($pageName == "AsignaturasVwAdd") {
             return $Language->phrase("Add");
         }
         return "";
@@ -842,15 +734,15 @@ class AlumnosAsignaturaTbl extends DbTable
     {
         switch (strtolower($action)) {
             case Config("API_VIEW_ACTION"):
-                return "AlumnosAsignaturaTblView";
+                return "AsignaturasVwView";
             case Config("API_ADD_ACTION"):
-                return "AlumnosAsignaturaTblAdd";
+                return "AsignaturasVwAdd";
             case Config("API_EDIT_ACTION"):
-                return "AlumnosAsignaturaTblEdit";
+                return "AsignaturasVwEdit";
             case Config("API_DELETE_ACTION"):
-                return "AlumnosAsignaturaTblDelete";
+                return "AsignaturasVwDelete";
             case Config("API_LIST_ACTION"):
-                return "AlumnosAsignaturaTblList";
+                return "AsignaturasVwList";
             default:
                 return "";
         }
@@ -871,16 +763,16 @@ class AlumnosAsignaturaTbl extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "AlumnosAsignaturaTblList";
+        return "AsignaturasVwList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("AlumnosAsignaturaTblView", $parm);
+            $url = $this->keyUrl("AsignaturasVwView", $parm);
         } else {
-            $url = $this->keyUrl("AlumnosAsignaturaTblView", Config("TABLE_SHOW_DETAIL") . "=");
+            $url = $this->keyUrl("AsignaturasVwView", Config("TABLE_SHOW_DETAIL") . "=");
         }
         return $this->addMasterUrl($url);
     }
@@ -889,9 +781,9 @@ class AlumnosAsignaturaTbl extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "AlumnosAsignaturaTblAdd?" . $parm;
+            $url = "AsignaturasVwAdd?" . $parm;
         } else {
-            $url = "AlumnosAsignaturaTblAdd";
+            $url = "AsignaturasVwAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -899,28 +791,28 @@ class AlumnosAsignaturaTbl extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("AlumnosAsignaturaTblEdit", $parm);
+        $url = $this->keyUrl("AsignaturasVwEdit", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline edit URL
     public function getInlineEditUrl()
     {
-        $url = $this->keyUrl("AlumnosAsignaturaTblList", "action=edit");
+        $url = $this->keyUrl("AsignaturasVwList", "action=edit");
         return $this->addMasterUrl($url);
     }
 
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("AlumnosAsignaturaTblAdd", $parm);
+        $url = $this->keyUrl("AsignaturasVwAdd", $parm);
         return $this->addMasterUrl($url);
     }
 
     // Inline copy URL
     public function getInlineCopyUrl()
     {
-        $url = $this->keyUrl("AlumnosAsignaturaTblList", "action=copy");
+        $url = $this->keyUrl("AsignaturasVwList", "action=copy");
         return $this->addMasterUrl($url);
     }
 
@@ -930,24 +822,20 @@ class AlumnosAsignaturaTbl extends DbTable
         if ($this->UseAjaxActions && ConvertToBool(Param("infinitescroll")) && CurrentPageID() == "list") {
             return $this->keyUrl(GetApiUrl(Config("API_DELETE_ACTION") . "/" . $this->TableVar));
         } else {
-            return $this->keyUrl("AlumnosAsignaturaTblDelete");
+            return $this->keyUrl("AsignaturasVwDelete");
         }
     }
 
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "alumnotbl" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id_alumno", $this->fk_id_alumno->getSessionValue()); // Use Session Value
-        }
         return $url;
     }
 
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
-        $json .= "\"id_alumnosasignatura\":" . JsonEncode($this->id_alumnosasignatura->CurrentValue, "number");
+        $json .= "\"id_asignatura\":" . JsonEncode($this->id_asignatura->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -958,8 +846,8 @@ class AlumnosAsignaturaTbl extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
-        if ($this->id_alumnosasignatura->CurrentValue !== null) {
-            $url .= "/" . $this->encodeKeyValue($this->id_alumnosasignatura->CurrentValue);
+        if ($this->id_asignatura->CurrentValue !== null) {
+            $url .= "/" . $this->encodeKeyValue($this->id_asignatura->CurrentValue);
         } else {
             return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
         }
@@ -1027,7 +915,7 @@ class AlumnosAsignaturaTbl extends DbTable
             $arKeys = Param("key_m");
             $cnt = count($arKeys);
         } else {
-            if (($keyValue = Param("id_alumnosasignatura") ?? Route("id_alumnosasignatura")) !== null) {
+            if (($keyValue = Param("id_asignatura") ?? Route("id_asignatura")) !== null) {
                 $arKeys[] = $keyValue;
             } elseif (IsApi() && (($keyValue = Key(0) ?? Route(2)) !== null)) {
                 $arKeys[] = $keyValue;
@@ -1073,9 +961,9 @@ class AlumnosAsignaturaTbl extends DbTable
                 $keyFilter .= " OR ";
             }
             if ($setCurrent) {
-                $this->id_alumnosasignatura->CurrentValue = $key;
+                $this->id_asignatura->CurrentValue = $key;
             } else {
-                $this->id_alumnosasignatura->OldValue = $key;
+                $this->id_asignatura->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -1100,16 +988,16 @@ class AlumnosAsignaturaTbl extends DbTable
         } else {
             return;
         }
-        $this->id_alumnosasignatura->setDbValue($row['id_alumnosasignatura']);
-        $this->fk_id_alumno->setDbValue($row['fk_id_alumno']);
-        $this->fk_id_asignatura->setDbValue($row['fk_id_asignatura']);
+        $this->id_asignatura->setDbValue($row['id_asignatura']);
+        $this->nombre_asignatura->setDbValue($row['nombre_asignatura']);
+        $this->id_profesor->setDbValue($row['id_profesor']);
     }
 
     // Render list content
     public function renderListContent($filter)
     {
         global $Response;
-        $listPage = "AlumnosAsignaturaTblList";
+        $listPage = "AsignaturasVwList";
         $listClass = PROJECT_NAMESPACE . $listPage;
         $page = new $listClass();
         $page->loadRecordsetFromFilter($filter);
@@ -1133,74 +1021,33 @@ class AlumnosAsignaturaTbl extends DbTable
 
         // Common render codes
 
-        // id_alumnosasignatura
-        $this->id_alumnosasignatura->CellCssStyle = "white-space: nowrap;";
+        // id_asignatura
 
-        // fk_id_alumno
+        // nombre_asignatura
 
-        // fk_id_asignatura
+        // id_profesor
 
-        // id_alumnosasignatura
-        $this->id_alumnosasignatura->ViewValue = $this->id_alumnosasignatura->CurrentValue;
+        // id_asignatura
+        $this->id_asignatura->ViewValue = $this->id_asignatura->CurrentValue;
 
-        // fk_id_alumno
-        $curVal = strval($this->fk_id_alumno->CurrentValue);
-        if ($curVal != "") {
-            $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-            if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCacheImpl($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
-                } else {
-                    $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
-                }
-            }
-        } else {
-            $this->fk_id_alumno->ViewValue = null;
-        }
+        // nombre_asignatura
+        $this->nombre_asignatura->ViewValue = $this->nombre_asignatura->CurrentValue;
 
-        // fk_id_asignatura
-        $curVal = strval($this->fk_id_asignatura->CurrentValue);
-        if ($curVal != "") {
-            $this->fk_id_asignatura->ViewValue = $this->fk_id_asignatura->lookupCacheOption($curVal);
-            if ($this->fk_id_asignatura->ViewValue === null) { // Lookup from database
-                $filterWrk = SearchFilter("`id_asignatura`", "=", $curVal, DATATYPE_NUMBER, "");
-                $lookupFilter = $this->fk_id_asignatura->getSelectFilter($this); // PHP
-                $sqlWrk = $this->fk_id_asignatura->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCacheImpl($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->fk_id_asignatura->Lookup->renderViewRow($rswrk[0]);
-                    $this->fk_id_asignatura->ViewValue = $this->fk_id_asignatura->displayValue($arwrk);
-                } else {
-                    $this->fk_id_asignatura->ViewValue = FormatNumber($this->fk_id_asignatura->CurrentValue, $this->fk_id_asignatura->formatPattern());
-                }
-            }
-        } else {
-            $this->fk_id_asignatura->ViewValue = null;
-        }
+        // id_profesor
+        $this->id_profesor->ViewValue = $this->id_profesor->CurrentValue;
+        $this->id_profesor->ViewValue = FormatNumber($this->id_profesor->ViewValue, $this->id_profesor->formatPattern());
 
-        // id_alumnosasignatura
-        $this->id_alumnosasignatura->HrefValue = "";
-        $this->id_alumnosasignatura->TooltipValue = "";
+        // id_asignatura
+        $this->id_asignatura->HrefValue = "";
+        $this->id_asignatura->TooltipValue = "";
 
-        // fk_id_alumno
-        $this->fk_id_alumno->HrefValue = "";
-        $this->fk_id_alumno->TooltipValue = "";
+        // nombre_asignatura
+        $this->nombre_asignatura->HrefValue = "";
+        $this->nombre_asignatura->TooltipValue = "";
 
-        // fk_id_asignatura
-        $this->fk_id_asignatura->HrefValue = "";
-        $this->fk_id_asignatura->TooltipValue = "";
+        // id_profesor
+        $this->id_profesor->HrefValue = "";
+        $this->id_profesor->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1217,42 +1064,25 @@ class AlumnosAsignaturaTbl extends DbTable
         // Call Row Rendering event
         $this->rowRendering();
 
-        // id_alumnosasignatura
-        $this->id_alumnosasignatura->setupEditAttributes();
-        $this->id_alumnosasignatura->EditValue = $this->id_alumnosasignatura->CurrentValue;
+        // id_asignatura
+        $this->id_asignatura->setupEditAttributes();
+        $this->id_asignatura->EditValue = $this->id_asignatura->CurrentValue;
 
-        // fk_id_alumno
-        $this->fk_id_alumno->setupEditAttributes();
-        if ($this->fk_id_alumno->getSessionValue() != "") {
-            $this->fk_id_alumno->CurrentValue = GetForeignKeyValue($this->fk_id_alumno->getSessionValue());
-            $curVal = strval($this->fk_id_alumno->CurrentValue);
-            if ($curVal != "") {
-                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCacheImpl($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
-                        $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
-                    } else {
-                        $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
-                    }
-                }
-            } else {
-                $this->fk_id_alumno->ViewValue = null;
-            }
-        } else {
-            $this->fk_id_alumno->PlaceHolder = RemoveHtml($this->fk_id_alumno->caption());
+        // nombre_asignatura
+        $this->nombre_asignatura->setupEditAttributes();
+        if (!$this->nombre_asignatura->Raw) {
+            $this->nombre_asignatura->CurrentValue = HtmlDecode($this->nombre_asignatura->CurrentValue);
         }
+        $this->nombre_asignatura->EditValue = $this->nombre_asignatura->CurrentValue;
+        $this->nombre_asignatura->PlaceHolder = RemoveHtml($this->nombre_asignatura->caption());
 
-        // fk_id_asignatura
-        $this->fk_id_asignatura->setupEditAttributes();
-        $this->fk_id_asignatura->PlaceHolder = RemoveHtml($this->fk_id_asignatura->caption());
+        // id_profesor
+        $this->id_profesor->setupEditAttributes();
+        $this->id_profesor->EditValue = $this->id_profesor->CurrentValue;
+        $this->id_profesor->PlaceHolder = RemoveHtml($this->id_profesor->caption());
+        if (strval($this->id_profesor->EditValue) != "" && is_numeric($this->id_profesor->EditValue)) {
+            $this->id_profesor->EditValue = FormatNumber($this->id_profesor->EditValue, null);
+        }
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1282,11 +1112,13 @@ class AlumnosAsignaturaTbl extends DbTable
             if ($doc->Horizontal) { // Horizontal format, write header
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
-                    $doc->exportCaption($this->fk_id_alumno);
-                    $doc->exportCaption($this->fk_id_asignatura);
+                    $doc->exportCaption($this->id_asignatura);
+                    $doc->exportCaption($this->nombre_asignatura);
+                    $doc->exportCaption($this->id_profesor);
                 } else {
-                    $doc->exportCaption($this->fk_id_alumno);
-                    $doc->exportCaption($this->fk_id_asignatura);
+                    $doc->exportCaption($this->id_asignatura);
+                    $doc->exportCaption($this->nombre_asignatura);
+                    $doc->exportCaption($this->id_profesor);
                 }
                 $doc->endExportRow();
             }
@@ -1316,11 +1148,13 @@ class AlumnosAsignaturaTbl extends DbTable
                 if (!$doc->ExportCustom) {
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
-                        $doc->exportField($this->fk_id_alumno);
-                        $doc->exportField($this->fk_id_asignatura);
+                        $doc->exportField($this->id_asignatura);
+                        $doc->exportField($this->nombre_asignatura);
+                        $doc->exportField($this->id_profesor);
                     } else {
-                        $doc->exportField($this->fk_id_alumno);
-                        $doc->exportField($this->fk_id_asignatura);
+                        $doc->exportField($this->id_asignatura);
+                        $doc->exportField($this->nombre_asignatura);
+                        $doc->exportField($this->id_profesor);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1396,13 +1230,6 @@ class AlumnosAsignaturaTbl extends DbTable
     {
         // Enter your code here
         // To cancel, set return value to false
-    $ya_existe = ExecuteScalar("SELECT count(*) FROM alumnos_asignatura_tbl WHERE fk_id_asignatura=$rsnew[fk_id_asignatura] and fk_id_alumno=$rsnew[fk_id_alumno]");
-    if($ya_existe>=1)//si no asignatura del profesor logeado y si no es admin
-        {
-            $this->CancelMessage = "No puede registrar nuevamente la misma asignatura al mismo alumno";
-            return false;
-        }   
-    else
         return true;
     }
 
@@ -1467,13 +1294,6 @@ class AlumnosAsignaturaTbl extends DbTable
     {
         // Enter your code here
         // To cancel, set return value to False
-    $idprofesor = ExecuteScalar("SELECT id_profesor FROM asignatura_tbl WHERE id_asignatura=$rs[fk_id_asignatura]");
-    if(($idprofesor != CurrentUserID()) and CurrentUserLevel()!= -1)//si no asignatura del profesor logeado y si no es admin
-        {
-            $this->CancelMessage = "No puede eliminar asignaturas cursadas de las que no es su responsable";
-            return false;
-        }   
-    else
         return true;
     }
 
@@ -1495,7 +1315,6 @@ class AlumnosAsignaturaTbl extends DbTable
     {
         //var_dump($fld->Name, $fld->Lookup, $filter); // Uncomment to view the filter
         // Enter your code here
-        //$fld->Lookup->UserFilter = "fk_id_alumno = 'xxx'";
     }
 
     // Row Rendering event

@@ -132,12 +132,12 @@ loadjs.ready(["wrapper", "head"], function () {
 <?php } ?>
 </table>
 <?php
-    if (in_array("calificacion_tbl", explode(",", $Page->getCurrentDetailTable())) && $calificacion_tbl->DetailView) {
+    if (in_array("alumnos_asignatura_tbl", explode(",", $Page->getCurrentDetailTable())) && $alumnos_asignatura_tbl->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("calificacion_tbl", "TblCaption") ?></h4>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("alumnos_asignatura_tbl", "TblCaption") ?></h4>
 <?php } ?>
-<?php include_once "CalificacionTblGrid.php" ?>
+<?php include_once "AlumnosAsignaturaTblGrid.php" ?>
 <?php } ?>
 </form>
 </main>

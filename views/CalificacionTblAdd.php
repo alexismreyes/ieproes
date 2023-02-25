@@ -73,10 +73,6 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "alumnotbl") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="alumnotbl">
-<input type="hidden" name="fk_id_alumno" value="<?= HtmlEncode($Page->fk_id_alumno->getSessionValue()) ?>">
-<?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "asignatura_tbl") { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="asignatura_tbl">
 <input type="hidden" name="fk_id_asignatura" value="<?= HtmlEncode($Page->fk_id_asignatura->getSessionValue()) ?>">
@@ -133,11 +129,6 @@ loadjs.ready("fcalificacion_tbladd", function() {
     <div id="r_fk_id_alumno"<?= $Page->fk_id_alumno->rowAttributes() ?>>
         <label id="elh_calificacion_tbl_fk_id_alumno" for="x_fk_id_alumno" class="<?= $Page->LeftColumnClass ?>"><?= $Page->fk_id_alumno->caption() ?><?= $Page->fk_id_alumno->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->fk_id_alumno->cellAttributes() ?>>
-<?php if ($Page->fk_id_alumno->getSessionValue() != "") { ?>
-<span<?= $Page->fk_id_alumno->viewAttributes() ?>>
-<span class="form-control-plaintext"><?= $Page->fk_id_alumno->getDisplayValue($Page->fk_id_alumno->ViewValue) ?></span></span>
-<input type="hidden" id="x_fk_id_alumno" name="x_fk_id_alumno" value="<?= HtmlEncode($Page->fk_id_alumno->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_calificacion_tbl_fk_id_alumno">
     <select
         id="x_fk_id_alumno"
@@ -171,7 +162,6 @@ loadjs.ready("fcalificacion_tbladd", function() {
 });
 </script>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>

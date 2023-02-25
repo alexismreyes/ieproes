@@ -20,18 +20,6 @@ class AlumnosAsignaturaTblController extends ControllerBase
         return $this->runPage($request, $response, $args, "AlumnosAsignaturaTblAdd");
     }
 
-    // view
-    public function view(Request $request, Response $response, array $args): Response
-    {
-        return $this->runPage($request, $response, $args, "AlumnosAsignaturaTblView");
-    }
-
-    // edit
-    public function edit(Request $request, Response $response, array $args): Response
-    {
-        return $this->runPage($request, $response, $args, "AlumnosAsignaturaTblEdit");
-    }
-
     // delete
     public function delete(Request $request, Response $response, array $args): Response
     {

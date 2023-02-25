@@ -638,9 +638,12 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
 
         // Set up list options
         $this->setupListOptions();
+
+        // Setup export options
+        $this->setupExportOptions();
         $this->id_alumnosasignatura->Visible = false;
+        $this->fk_id_alumno->Visible = false;
         $this->fk_id_asignatura->setVisibility();
-        $this->fk_id_alumno->setVisibility();
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -676,8 +679,8 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->fk_id_asignatura);
         $this->setupLookupOptions($this->fk_id_alumno);
+        $this->setupLookupOptions($this->fk_id_asignatura);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -759,24 +762,17 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
         // Restore master/detail filter from session
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
-
-        // Add master User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-                if ($this->getCurrentMasterTable() == "asignatura_tbl") {
-                    $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "asignatura_tbl"); // Add master User ID filter
-                }
-        }
         AddFilter($filter, $this->DbDetailFilter);
         AddFilter($filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "asignatura_tbl") {
-            $masterTbl = Container("asignatura_tbl");
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "alumnotbl") {
+            $masterTbl = Container("alumnotbl");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("AsignaturaTblList"); // Return to master page
+                $this->terminate("AlumnotblList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -983,10 +979,6 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
             if ($this->getSessionOrderBy() == "" && $defaultSort != "") {
                 $this->setSessionOrderBy($defaultSort);
             }
-            $defaultSortList = ""; // Set up default sort
-            if ($this->getSessionOrderByList() == "" && $defaultSortList != "") {
-                $this->setSessionOrderByList($defaultSortList);
-            }
         }
 
         // Check for "order" parameter
@@ -994,7 +986,6 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->fk_id_asignatura); // fk_id_asignatura
-            $this->updateSort($this->fk_id_alumno); // fk_id_alumno
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1015,17 +1006,16 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->fk_id_asignatura->setSessionValue("");
+                        $this->fk_id_alumno->setSessionValue("");
             }
 
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
-                $this->setSessionOrderByList($orderBy);
                 $this->id_alumnosasignatura->setSort("");
-                $this->fk_id_asignatura->setSort("");
                 $this->fk_id_alumno->setSort("");
+                $this->fk_id_asignatura->setSort("");
             }
 
             // Reset start position
@@ -1044,18 +1034,6 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
-
-        // "view"
-        $item = &$this->ListOptions->add("view");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canView();
-        $item->OnLeft = false;
-
-        // "edit"
-        $item = &$this->ListOptions->add("edit");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->canEdit();
-        $item->OnLeft = false;
 
         // "delete"
         $item = &$this->ListOptions->add("delete");
@@ -1121,32 +1099,6 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl(false);
         if ($this->CurrentMode == "view") {
-            // "view"
-            $opt = $this->ListOptions["view"];
-            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
-                if ($this->ModalView && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"alumnos_asignatura_tbl\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
-            // "edit"
-            $opt = $this->ListOptions["edit"];
-            $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
-                if ($this->ModalEdit && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"alumnos_asignatura_tbl\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
             if ($Security->canDelete()) {
@@ -1239,7 +1191,6 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $option->add("fk_id_asignatura", $this->createColumnOption("fk_id_asignatura"));
-            $option->add("fk_id_alumno", $this->createColumnOption("fk_id_alumno"));
         }
 
         // Set up options default
@@ -1612,13 +1563,8 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id_alumnosasignatura->setDbValue($row['id_alumnosasignatura']);
-        $this->fk_id_asignatura->setDbValue($row['fk_id_asignatura']);
         $this->fk_id_alumno->setDbValue($row['fk_id_alumno']);
-        if (array_key_exists('EV__fk_id_alumno', $row)) {
-            $this->fk_id_alumno->VirtualValue = $row['EV__fk_id_alumno']; // Set up virtual field value
-        } else {
-            $this->fk_id_alumno->VirtualValue = ""; // Clear value
-        }
+        $this->fk_id_asignatura->setDbValue($row['fk_id_asignatura']);
     }
 
     // Return a row with default values
@@ -1626,8 +1572,8 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
     {
         $row = [];
         $row['id_alumnosasignatura'] = $this->id_alumnosasignatura->DefaultValue;
-        $row['fk_id_asignatura'] = $this->fk_id_asignatura->DefaultValue;
         $row['fk_id_alumno'] = $this->fk_id_alumno->DefaultValue;
+        $row['fk_id_asignatura'] = $this->fk_id_asignatura->DefaultValue;
         return $row;
     }
 
@@ -1671,19 +1617,43 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
         // id_alumnosasignatura
         $this->id_alumnosasignatura->CellCssStyle = "white-space: nowrap;";
 
-        // fk_id_asignatura
-
         // fk_id_alumno
+
+        // fk_id_asignatura
 
         // View row
         if ($this->RowType == ROWTYPE_VIEW) {
+            // fk_id_alumno
+            $curVal = strval($this->fk_id_alumno->CurrentValue);
+            if ($curVal != "") {
+                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
+                if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCacheImpl($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
+                        $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
+                    } else {
+                        $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
+                    }
+                }
+            } else {
+                $this->fk_id_alumno->ViewValue = null;
+            }
+
             // fk_id_asignatura
             $curVal = strval($this->fk_id_asignatura->CurrentValue);
             if ($curVal != "") {
                 $this->fk_id_asignatura->ViewValue = $this->fk_id_asignatura->lookupCacheOption($curVal);
                 if ($this->fk_id_asignatura->ViewValue === null) { // Lookup from database
                     $filterWrk = SearchFilter("`id_asignatura`", "=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fk_id_asignatura->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $lookupFilter = $this->fk_id_asignatura->getSelectFilter($this); // PHP
+                    $sqlWrk = $this->fk_id_asignatura->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCacheImpl($this->Cache);
@@ -1700,46 +1670,118 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
                 $this->fk_id_asignatura->ViewValue = null;
             }
 
-            // fk_id_alumno
-            if ($this->fk_id_alumno->VirtualValue != "") {
-                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->VirtualValue;
-            } else {
-                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->CurrentValue;
-                $curVal = strval($this->fk_id_alumno->CurrentValue);
-                if ($curVal != "") {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                    if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCacheImpl($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
-                            $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
-                        } else {
-                            $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->fk_id_alumno->ViewValue = null;
-                }
-            }
-
             // fk_id_asignatura
             $this->fk_id_asignatura->HrefValue = "";
             $this->fk_id_asignatura->TooltipValue = "";
-
-            // fk_id_alumno
-            $this->fk_id_alumno->HrefValue = "";
-            $this->fk_id_alumno->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
+        }
+    }
+
+    // Get export HTML tag
+    protected function getExportTag($type, $custom = false)
+    {
+        global $Language;
+        if ($type == "print" || $custom) { // Printer friendly / custom export
+            $pageUrl = $this->pageUrl(false);
+            $exportUrl = GetUrl($pageUrl . "export=" . $type . ($custom ? "&amp;custom=1" : ""));
+        } else { // Export API URL
+            $exportUrl = GetApiUrl(Config("API_EXPORT_ACTION") . "/" . $type . "/" . $this->TableVar);
+        }
+        if (SameText($type, "excel")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"falumnos_asignatura_tbllist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
+            }
+        } elseif (SameText($type, "word")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"falumnos_asignatura_tbllist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
+            }
+        } elseif (SameText($type, "pdf")) {
+            if ($custom) {
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"falumnos_asignatura_tbllist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+            } else {
+                return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
+            }
+        } elseif (SameText($type, "html")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtml", true)) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
+        } elseif (SameText($type, "xml")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXml", true)) . "\">" . $Language->phrase("ExportToXml") . "</a>";
+        } elseif (SameText($type, "csv")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
+        } elseif (SameText($type, "email")) {
+            $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="falumnos_asignatura_tbllist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+        } elseif (SameText($type, "print")) {
+            return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
+        }
+    }
+
+    // Set up export options
+    protected function setupExportOptions()
+    {
+        global $Language, $Security;
+
+        // Printer friendly
+        $item = &$this->ExportOptions->add("print");
+        $item->Body = $this->getExportTag("print");
+        $item->Visible = true;
+
+        // Export to Excel
+        $item = &$this->ExportOptions->add("excel");
+        $item->Body = $this->getExportTag("excel");
+        $item->Visible = true;
+
+        // Export to Word
+        $item = &$this->ExportOptions->add("word");
+        $item->Body = $this->getExportTag("word");
+        $item->Visible = true;
+
+        // Export to HTML
+        $item = &$this->ExportOptions->add("html");
+        $item->Body = $this->getExportTag("html");
+        $item->Visible = false;
+
+        // Export to XML
+        $item = &$this->ExportOptions->add("xml");
+        $item->Body = $this->getExportTag("xml");
+        $item->Visible = false;
+
+        // Export to CSV
+        $item = &$this->ExportOptions->add("csv");
+        $item->Body = $this->getExportTag("csv");
+        $item->Visible = false;
+
+        // Export to PDF
+        $item = &$this->ExportOptions->add("pdf");
+        $item->Body = $this->getExportTag("pdf");
+        $item->Visible = false;
+
+        // Export to Email
+        $item = &$this->ExportOptions->add("email");
+        $item->Body = $this->getExportTag("email");
+        $item->Visible = false;
+
+        // Drop down button for export
+        $this->ExportOptions->UseButtonGroup = true;
+        $this->ExportOptions->UseDropDownButton = false;
+        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
+            $this->ExportOptions->UseDropDownButton = true;
+        }
+        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+
+        // Add group option item
+        $item = &$this->ExportOptions->addGroupOption();
+        $item->Body = "";
+        $item->Visible = false;
+        if (!$Security->canExport()) { // Export not allowed
+            $this->ExportOptions->hideAllOptions();
         }
     }
 
@@ -1784,6 +1826,88 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
         }
     }
 
+    /**
+    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
+    *
+    * @param bool $return Return the data rather than output it
+    * @return mixed
+    */
+    public function exportData($doc)
+    {
+        global $Language;
+        $utf8 = SameText(Config("PROJECT_CHARSET"), "utf-8");
+
+        // Load recordset
+        $this->TotalRecords = $this->listRecordCount();
+        $this->StartRecord = 1;
+
+        // Export all
+        if ($this->ExportAll) {
+            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
+                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            }
+            $this->DisplayRecords = $this->TotalRecords;
+            $this->StopRecord = $this->TotalRecords;
+        } else { // Export one page only
+            $this->setupStartRecord(); // Set up start record position
+            // Set the last record to display
+            if ($this->DisplayRecords <= 0) {
+                $this->StopRecord = $this->TotalRecords;
+            } else {
+                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
+            }
+        }
+        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
+        if (!$rs || !$doc) {
+            RemoveHeader("Content-Type"); // Remove header
+            RemoveHeader("Content-Disposition");
+            $this->showMessage();
+            return;
+        }
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+
+        // Call Page Exporting server event
+        $doc->ExportCustom = !$this->pageExporting($doc);
+
+        // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "alumnotbl") {
+            $alumnotbl = new AlumnotblList();
+            $rsmaster = $alumnotbl->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->setTable($alumnotbl);
+                    $alumnotbl->exportDocument($doc, new Recordset($rsmaster));
+                    $doc->exportEmptyRow();
+                    $doc->setTable($this);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Page header
+        $header = $this->PageHeader;
+        $this->pageDataRendering($header);
+        $doc->Text .= $header;
+        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
+
+        // Close recordset
+        $rs->close();
+
+        // Page footer
+        $footer = $this->PageFooter;
+        $this->pageDataRendered($footer);
+        $doc->Text .= $footer;
+
+        // Export header and footer
+        $doc->exportHeaderAndFooter();
+
+        // Call Page Exported server event
+        $this->pageExported($doc);
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -1797,15 +1921,15 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "asignatura_tbl") {
+            if ($masterTblVar == "alumnotbl") {
                 $validMaster = true;
-                $masterTbl = Container("asignatura_tbl");
-                if (($parm = Get("fk_id_asignatura", Get("fk_id_asignatura"))) !== null) {
-                    $masterTbl->id_asignatura->setQueryStringValue($parm);
-                    $this->fk_id_asignatura->QueryStringValue = $masterTbl->id_asignatura->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->fk_id_asignatura->setSessionValue($this->fk_id_asignatura->QueryStringValue);
-                    $foreignKeys["fk_id_asignatura"] = $this->fk_id_asignatura->QueryStringValue;
-                    if (!is_numeric($masterTbl->id_asignatura->QueryStringValue)) {
+                $masterTbl = Container("alumnotbl");
+                if (($parm = Get("fk_id_alumno", Get("fk_id_alumno"))) !== null) {
+                    $masterTbl->id_alumno->setQueryStringValue($parm);
+                    $this->fk_id_alumno->QueryStringValue = $masterTbl->id_alumno->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->fk_id_alumno->setSessionValue($this->fk_id_alumno->QueryStringValue);
+                    $foreignKeys["fk_id_alumno"] = $this->fk_id_alumno->QueryStringValue;
+                    if (!is_numeric($masterTbl->id_alumno->QueryStringValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -1819,15 +1943,15 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "asignatura_tbl") {
+            if ($masterTblVar == "alumnotbl") {
                 $validMaster = true;
-                $masterTbl = Container("asignatura_tbl");
-                if (($parm = Post("fk_id_asignatura", Post("fk_id_asignatura"))) !== null) {
-                    $masterTbl->id_asignatura->setFormValue($parm);
-                    $this->fk_id_asignatura->FormValue = $masterTbl->id_asignatura->FormValue;
-                    $this->fk_id_asignatura->setSessionValue($this->fk_id_asignatura->FormValue);
-                    $foreignKeys["fk_id_asignatura"] = $this->fk_id_asignatura->FormValue;
-                    if (!is_numeric($masterTbl->id_asignatura->FormValue)) {
+                $masterTbl = Container("alumnotbl");
+                if (($parm = Post("fk_id_alumno", Post("fk_id_alumno"))) !== null) {
+                    $masterTbl->id_alumno->setFormValue($parm);
+                    $this->fk_id_alumno->FormValue = $masterTbl->id_alumno->FormValue;
+                    $this->fk_id_alumno->setSessionValue($this->fk_id_alumno->FormValue);
+                    $foreignKeys["fk_id_alumno"] = $this->fk_id_alumno->FormValue;
+                    if (!is_numeric($masterTbl->id_alumno->FormValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -1853,9 +1977,9 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "asignatura_tbl") {
-                if (!array_key_exists("fk_id_asignatura", $foreignKeys)) { // Not current foreign key
-                    $this->fk_id_asignatura->setSessionValue("");
+            if ($masterTblVar != "alumnotbl") {
+                if (!array_key_exists("fk_id_alumno", $foreignKeys)) { // Not current foreign key
+                    $this->fk_id_alumno->setSessionValue("");
                 }
             }
         }
@@ -1886,9 +2010,10 @@ class AlumnosAsignaturaTblList extends AlumnosAsignaturaTbl
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_fk_id_asignatura":
-                    break;
                 case "x_fk_id_alumno":
+                    break;
+                case "x_fk_id_asignatura":
+                    $lookupFilter = $fld->getSelectFilter(); // PHP
                     break;
                 default:
                     $lookupFilter = "";

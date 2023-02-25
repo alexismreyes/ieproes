@@ -961,10 +961,6 @@ class AsignaturaTblEdit extends AsignaturaTbl
         if (in_array("calificacion_tbl", $detailTblVar) && $detailPage->DetailEdit) {
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
-        $detailPage = Container("AlumnosAsignaturaTblGrid");
-        if (in_array("alumnos_asignatura_tbl", $detailTblVar) && $detailPage->DetailEdit) {
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1040,14 +1036,6 @@ class AsignaturaTblEdit extends AsignaturaTbl
                     $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 }
             }
-            if ($editRow) {
-                $detailPage = Container("AlumnosAsignaturaTblGrid");
-                if (in_array("alumnos_asignatura_tbl", $detailTblVar) && $detailPage->DetailEdit) {
-                    $Security->loadCurrentUserLevel($this->ProjectID . "alumnos_asignatura_tbl"); // Load user level of detail table
-                    $editRow = $detailPage->gridUpdate();
-                    $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                }
-            }
 
             // Commit/Rollback transaction
             if ($this->getCurrentDetailTable() != "") {
@@ -1111,22 +1099,6 @@ class AsignaturaTblEdit extends AsignaturaTbl
             $detailTblVar = explode(",", $detailTblVar);
             if (in_array("calificacion_tbl", $detailTblVar)) {
                 $detailPageObj = Container("CalificacionTblGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->fk_id_asignatura->IsDetailKey = true;
-                    $detailPageObj->fk_id_asignatura->CurrentValue = $this->id_asignatura->CurrentValue;
-                    $detailPageObj->fk_id_asignatura->setSessionValue($detailPageObj->fk_id_asignatura->CurrentValue);
-                    $detailPageObj->fk_id_alumno->setSessionValue(""); // Clear session key
-                }
-            }
-            if (in_array("alumnos_asignatura_tbl", $detailTblVar)) {
-                $detailPageObj = Container("AlumnosAsignaturaTblGrid");
                 if ($detailPageObj->DetailEdit) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "edit";

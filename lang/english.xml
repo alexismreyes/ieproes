@@ -1158,6 +1158,9 @@
   </global>
   <project>
     <phrase id="footertext" value="&amp;copy;2022 e.World Technology Limited. All rights reserved." />
+    <menu id="11">
+      <phrase id="menutext" value="asignaturas vw" />
+    </menu>
     <menu id="1">
       <phrase id="menutext" value="Alumnos" />
     </menu>
@@ -1165,7 +1168,7 @@
       <phrase id="menutext" value="Asignaturas" />
     </menu>
     <menu id="8">
-      <phrase id="menutext" value="Alumnos por asignatura" />
+      <phrase id="menutext" value="Asignaturas Cursadas" />
     </menu>
     <menu id="10">
       <phrase id="menutext" value="Tipos de evaluaciones" />
@@ -1319,15 +1322,15 @@
       </field>
     </table>
     <table id="alumnos_asignatura_tbl">
-      <phrase id="tblcaption" value="Alumnos por asignatura" />
+      <phrase id="tblcaption" value="Asignaturas Cursadas" />
       <field id="id_alumnosasignatura">
         <phrase id="fldcaption" value="id alumnosasignatura" />
       </field>
-      <field id="fk_id_asignatura">
-        <phrase id="fldcaption" value="Asignatura" />
-      </field>
       <field id="fk_id_alumno">
         <phrase id="fldcaption" value="Alumno" />
+      </field>
+      <field id="fk_id_asignatura">
+        <phrase id="fldcaption" value="Asignatura" />
       </field>
     </table>
     <table id="alumnosporasigntura_vw">
@@ -1358,6 +1361,18 @@
       </field>
       <field id="descripcion_evaluacion">
         <phrase id="fldcaption" value="Descripcion" />
+      </field>
+    </table>
+    <table id="asignaturas_vw">
+      <phrase id="tblcaption" value="asignaturas vw" />
+      <field id="id_asignatura">
+        <phrase id="fldcaption" value="id asignatura" />
+      </field>
+      <field id="nombre_asignatura">
+        <phrase id="fldcaption" value="nombre asignatura" />
+      </field>
+      <field id="id_profesor">
+        <phrase id="fldcaption" value="id profesor" />
       </field>
     </table>
   </project>

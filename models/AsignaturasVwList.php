@@ -10,7 +10,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 /**
  * Page class
  */
-class AlumnosporasignturaVwList extends AlumnosporasignturaVw
+class AsignaturasVwList extends AsignaturasVw
 {
     use MessagesTrait;
 
@@ -21,7 +21,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "AlumnosporasignturaVwList";
+    public $PageObjName = "AsignaturasVwList";
 
     // View file path
     public $View = null;
@@ -33,13 +33,13 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "falumnosporasigntura_vwlist";
+    public $FormName = "fasignaturas_vwlist";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "AlumnosporasignturaVwList";
+    public $CurrentPageName = "AsignaturasVwList";
 
     // Page URLs
     public $AddUrl;
@@ -145,8 +145,8 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
-        $this->TableVar = 'alumnosporasigntura_vw';
-        $this->TableName = 'alumnosporasigntura_vw';
+        $this->TableVar = 'asignaturas_vw';
+        $this->TableName = 'asignaturas_vw';
 
         // Table CSS class
         $this->TableClass = "table table-bordered table-hover table-sm ew-table";
@@ -166,26 +166,26 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         // Language object
         $Language = Container("language");
 
-        // Table object (alumnosporasigntura_vw)
-        if (!isset($GLOBALS["alumnosporasigntura_vw"]) || get_class($GLOBALS["alumnosporasigntura_vw"]) == PROJECT_NAMESPACE . "alumnosporasigntura_vw") {
-            $GLOBALS["alumnosporasigntura_vw"] = &$this;
+        // Table object (asignaturas_vw)
+        if (!isset($GLOBALS["asignaturas_vw"]) || get_class($GLOBALS["asignaturas_vw"]) == PROJECT_NAMESPACE . "asignaturas_vw") {
+            $GLOBALS["asignaturas_vw"] = &$this;
         }
 
         // Page URL
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "AlumnosporasignturaVwAdd";
+        $this->AddUrl = "AsignaturasVwAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
         $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "AlumnosporasignturaVwDelete";
-        $this->MultiUpdateUrl = "AlumnosporasignturaVwUpdate";
+        $this->MultiDeleteUrl = "AsignaturasVwDelete";
+        $this->MultiUpdateUrl = "AsignaturasVwUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
-            define(PROJECT_NAMESPACE . "TABLE_NAME", 'alumnosporasigntura_vw');
+            define(PROJECT_NAMESPACE . "TABLE_NAME", 'asignaturas_vw');
         }
 
         // Start timer
@@ -340,7 +340,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page => View page
                     $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = $pageName == "AlumnosporasignturaVwView"; // If View page, no primary button
+                    $result["view"] = $pageName == "AsignaturasVwView"; // If View page, no primary button
                 } else { // List page
                     // $result["list"] = $this->PageID == "search"; // Refresh List page if current page is Search page
                     $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
@@ -433,7 +433,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
     {
         $key = "";
         if (is_array($ar)) {
-            $key .= @$ar['id_alumno'];
+            $key .= @$ar['id_asignatura'];
         }
         return $key;
     }
@@ -446,7 +446,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
     protected function hideFieldsForAddEdit()
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
-            $this->id_alumno->Visible = false;
+            $this->id_asignatura->Visible = false;
         }
     }
 
@@ -641,11 +641,9 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
 
         // Setup export options
         $this->setupExportOptions();
-        $this->nombre_alumno->setVisibility();
-        $this->apellidos_alumno->setVisibility();
-        $this->numcarnet_alumno->setVisibility();
-        $this->id_alumno->setVisibility();
-        $this->fk_id_asignatura->setVisibility();
+        $this->id_asignatura->setVisibility();
+        $this->nombre_asignatura->setVisibility();
+        $this->id_profesor->setVisibility();
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -679,7 +677,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
-            $this->FormName = "falumnosporasigntura_vwgrid";
+            $this->FormName = "fasignaturas_vwgrid";
         }
 
         // Set up page action
@@ -1007,11 +1005,9 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         // Initialize
         $filterList = "";
         $savedFilterList = "";
-        $filterList = Concat($filterList, $this->nombre_alumno->AdvancedSearch->toJson(), ","); // Field nombre_alumno
-        $filterList = Concat($filterList, $this->apellidos_alumno->AdvancedSearch->toJson(), ","); // Field apellidos_alumno
-        $filterList = Concat($filterList, $this->numcarnet_alumno->AdvancedSearch->toJson(), ","); // Field numcarnet_alumno
-        $filterList = Concat($filterList, $this->id_alumno->AdvancedSearch->toJson(), ","); // Field id_alumno
-        $filterList = Concat($filterList, $this->fk_id_asignatura->AdvancedSearch->toJson(), ","); // Field fk_id_asignatura
+        $filterList = Concat($filterList, $this->id_asignatura->AdvancedSearch->toJson(), ","); // Field id_asignatura
+        $filterList = Concat($filterList, $this->nombre_asignatura->AdvancedSearch->toJson(), ","); // Field nombre_asignatura
+        $filterList = Concat($filterList, $this->id_profesor->AdvancedSearch->toJson(), ","); // Field id_profesor
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1033,7 +1029,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         global $UserProfile;
         if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
             $filters = Post("filters");
-            $UserProfile->setSearchFilters(CurrentUserName(), "falumnosporasigntura_vwsrch", $filters);
+            $UserProfile->setSearchFilters(CurrentUserName(), "fasignaturas_vwsrch", $filters);
             WriteJson([["success" => true]]); // Success
             return true;
         } elseif (Post("cmd") == "resetfilter") {
@@ -1052,45 +1048,29 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         $filter = json_decode(Post("filter"), true);
         $this->Command = "search";
 
-        // Field nombre_alumno
-        $this->nombre_alumno->AdvancedSearch->SearchValue = @$filter["x_nombre_alumno"];
-        $this->nombre_alumno->AdvancedSearch->SearchOperator = @$filter["z_nombre_alumno"];
-        $this->nombre_alumno->AdvancedSearch->SearchCondition = @$filter["v_nombre_alumno"];
-        $this->nombre_alumno->AdvancedSearch->SearchValue2 = @$filter["y_nombre_alumno"];
-        $this->nombre_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_nombre_alumno"];
-        $this->nombre_alumno->AdvancedSearch->save();
+        // Field id_asignatura
+        $this->id_asignatura->AdvancedSearch->SearchValue = @$filter["x_id_asignatura"];
+        $this->id_asignatura->AdvancedSearch->SearchOperator = @$filter["z_id_asignatura"];
+        $this->id_asignatura->AdvancedSearch->SearchCondition = @$filter["v_id_asignatura"];
+        $this->id_asignatura->AdvancedSearch->SearchValue2 = @$filter["y_id_asignatura"];
+        $this->id_asignatura->AdvancedSearch->SearchOperator2 = @$filter["w_id_asignatura"];
+        $this->id_asignatura->AdvancedSearch->save();
 
-        // Field apellidos_alumno
-        $this->apellidos_alumno->AdvancedSearch->SearchValue = @$filter["x_apellidos_alumno"];
-        $this->apellidos_alumno->AdvancedSearch->SearchOperator = @$filter["z_apellidos_alumno"];
-        $this->apellidos_alumno->AdvancedSearch->SearchCondition = @$filter["v_apellidos_alumno"];
-        $this->apellidos_alumno->AdvancedSearch->SearchValue2 = @$filter["y_apellidos_alumno"];
-        $this->apellidos_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_apellidos_alumno"];
-        $this->apellidos_alumno->AdvancedSearch->save();
+        // Field nombre_asignatura
+        $this->nombre_asignatura->AdvancedSearch->SearchValue = @$filter["x_nombre_asignatura"];
+        $this->nombre_asignatura->AdvancedSearch->SearchOperator = @$filter["z_nombre_asignatura"];
+        $this->nombre_asignatura->AdvancedSearch->SearchCondition = @$filter["v_nombre_asignatura"];
+        $this->nombre_asignatura->AdvancedSearch->SearchValue2 = @$filter["y_nombre_asignatura"];
+        $this->nombre_asignatura->AdvancedSearch->SearchOperator2 = @$filter["w_nombre_asignatura"];
+        $this->nombre_asignatura->AdvancedSearch->save();
 
-        // Field numcarnet_alumno
-        $this->numcarnet_alumno->AdvancedSearch->SearchValue = @$filter["x_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->SearchOperator = @$filter["z_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->SearchCondition = @$filter["v_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->SearchValue2 = @$filter["y_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->save();
-
-        // Field id_alumno
-        $this->id_alumno->AdvancedSearch->SearchValue = @$filter["x_id_alumno"];
-        $this->id_alumno->AdvancedSearch->SearchOperator = @$filter["z_id_alumno"];
-        $this->id_alumno->AdvancedSearch->SearchCondition = @$filter["v_id_alumno"];
-        $this->id_alumno->AdvancedSearch->SearchValue2 = @$filter["y_id_alumno"];
-        $this->id_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_id_alumno"];
-        $this->id_alumno->AdvancedSearch->save();
-
-        // Field fk_id_asignatura
-        $this->fk_id_asignatura->AdvancedSearch->SearchValue = @$filter["x_fk_id_asignatura"];
-        $this->fk_id_asignatura->AdvancedSearch->SearchOperator = @$filter["z_fk_id_asignatura"];
-        $this->fk_id_asignatura->AdvancedSearch->SearchCondition = @$filter["v_fk_id_asignatura"];
-        $this->fk_id_asignatura->AdvancedSearch->SearchValue2 = @$filter["y_fk_id_asignatura"];
-        $this->fk_id_asignatura->AdvancedSearch->SearchOperator2 = @$filter["w_fk_id_asignatura"];
-        $this->fk_id_asignatura->AdvancedSearch->save();
+        // Field id_profesor
+        $this->id_profesor->AdvancedSearch->SearchValue = @$filter["x_id_profesor"];
+        $this->id_profesor->AdvancedSearch->SearchOperator = @$filter["z_id_profesor"];
+        $this->id_profesor->AdvancedSearch->SearchCondition = @$filter["v_id_profesor"];
+        $this->id_profesor->AdvancedSearch->SearchValue2 = @$filter["y_id_profesor"];
+        $this->id_profesor->AdvancedSearch->SearchOperator2 = @$filter["w_id_profesor"];
+        $this->id_profesor->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1130,9 +1110,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->nombre_alumno;
-        $searchFlds[] = &$this->apellidos_alumno;
-        $searchFlds[] = &$this->numcarnet_alumno;
+        $searchFlds[] = &$this->nombre_asignatura;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1211,11 +1189,9 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->nombre_alumno); // nombre_alumno
-            $this->updateSort($this->apellidos_alumno); // apellidos_alumno
-            $this->updateSort($this->numcarnet_alumno); // numcarnet_alumno
-            $this->updateSort($this->id_alumno); // id_alumno
-            $this->updateSort($this->fk_id_asignatura); // fk_id_asignatura
+            $this->updateSort($this->id_asignatura); // id_asignatura
+            $this->updateSort($this->nombre_asignatura); // nombre_asignatura
+            $this->updateSort($this->id_profesor); // id_profesor
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1240,11 +1216,9 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
-                $this->nombre_alumno->setSort("");
-                $this->apellidos_alumno->setSort("");
-                $this->numcarnet_alumno->setSort("");
-                $this->id_alumno->setSort("");
-                $this->fk_id_asignatura->setSort("");
+                $this->id_asignatura->setSort("");
+                $this->nombre_asignatura->setSort("");
+                $this->id_profesor->setSort("");
             }
 
             // Reset start position
@@ -1335,11 +1309,11 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
                 if ($listaction->Select == ACTION_SINGLE && $allowed) {
                     $caption = $listaction->Caption;
                     $icon = ($listaction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listaction->Icon)) . "\" data-caption=\"" . HtmlTitle($caption) . "\"></i> " : "";
-                    $link = "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . HtmlTitle($caption) . "\" data-ew-action=\"submit\" form=\"falumnosporasigntura_vwlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listaction->toDataAttrs() . ">" . $icon . " " . $listaction->Caption . "</button></li>";
+                    $link = "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . HtmlTitle($caption) . "\" data-ew-action=\"submit\" form=\"fasignaturas_vwlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listaction->toDataAttrs() . ">" . $icon . " " . $listaction->Caption . "</button></li>";
                     if ($link != "") {
                         $links[] = $link;
                         if ($body == "") { // Setup first button
-                            $body = "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" data-ew-action=\"submit\" form=\"falumnosporasigntura_vwlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listaction->toDataAttrs() . ">" . $icon . " " . $listaction->Caption . "</button>";
+                            $body = "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" data-ew-action=\"submit\" form=\"fasignaturas_vwlist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listaction->toDataAttrs() . ">" . $icon . " " . $listaction->Caption . "</button>";
                         }
                     }
                 }
@@ -1360,7 +1334,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
-        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->id_alumno->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
+        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->id_asignatura->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1387,11 +1361,9 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $option->add("nombre_alumno", $this->createColumnOption("nombre_alumno"));
-            $option->add("apellidos_alumno", $this->createColumnOption("apellidos_alumno"));
-            $option->add("numcarnet_alumno", $this->createColumnOption("numcarnet_alumno"));
-            $option->add("id_alumno", $this->createColumnOption("id_alumno"));
-            $option->add("fk_id_asignatura", $this->createColumnOption("fk_id_asignatura"));
+            $option->add("id_asignatura", $this->createColumnOption("id_asignatura"));
+            $option->add("nombre_asignatura", $this->createColumnOption("nombre_asignatura"));
+            $option->add("id_profesor", $this->createColumnOption("id_profesor"));
         }
 
         // Set up options default
@@ -1411,10 +1383,10 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
 
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"falumnosporasigntura_vwsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
+        $item->Body = "<a class=\"ew-save-filter\" data-form=\"fasignaturas_vwsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
         $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"falumnosporasigntura_vwsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
+        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fasignaturas_vwsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
         $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1453,7 +1425,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
                 $item = &$option->add("custom_" . $listaction->Action);
                 $caption = $listaction->Caption;
                 $icon = ($listaction->Icon != "") ? '<i class="' . HtmlEncode($listaction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="falumnosporasigntura_vwlist"' . $listaction->toDataAttrs() . '>' . $icon . '</button>';
+                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="fasignaturas_vwlist"' . $listaction->toDataAttrs() . '>' . $icon . '</button>';
                 $item->Visible = $listaction->Allow;
             }
         }
@@ -1602,7 +1574,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
 
                 // Set row properties
                 $this->resetAttributes();
-                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_alumnosporasigntura_vw", "data-rowtype" => ROWTYPE_ADD]);
+                $this->RowAttrs->merge(["data-rowindex" => $this->RowIndex, "id" => "r0_asignaturas_vw", "data-rowtype" => ROWTYPE_ADD]);
                 $this->RowAttrs->appendClass("ew-template");
                 // Render row
                 $this->RowType = ROWTYPE_ADD;
@@ -1663,7 +1635,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         $this->RowAttrs->merge([
             "data-rowindex" => $this->RowCount,
             "data-key" => $this->getKey(true),
-            "id" => "r" . $this->RowCount . "_alumnosporasigntura_vw",
+            "id" => "r" . $this->RowCount . "_asignaturas_vw",
             "data-rowtype" => $this->RowType,
             "class" => ($this->RowCount % 2 != 1) ? "ew-table-alt-row" : "",
         ]);
@@ -1773,22 +1745,18 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
 
         // Call Row Selected event
         $this->rowSelected($row);
-        $this->nombre_alumno->setDbValue($row['nombre_alumno']);
-        $this->apellidos_alumno->setDbValue($row['apellidos_alumno']);
-        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
-        $this->id_alumno->setDbValue($row['id_alumno']);
-        $this->fk_id_asignatura->setDbValue($row['fk_id_asignatura']);
+        $this->id_asignatura->setDbValue($row['id_asignatura']);
+        $this->nombre_asignatura->setDbValue($row['nombre_asignatura']);
+        $this->id_profesor->setDbValue($row['id_profesor']);
     }
 
     // Return a row with default values
     protected function newRow()
     {
         $row = [];
-        $row['nombre_alumno'] = $this->nombre_alumno->DefaultValue;
-        $row['apellidos_alumno'] = $this->apellidos_alumno->DefaultValue;
-        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
-        $row['id_alumno'] = $this->id_alumno->DefaultValue;
-        $row['fk_id_asignatura'] = $this->fk_id_asignatura->DefaultValue;
+        $row['id_asignatura'] = $this->id_asignatura->DefaultValue;
+        $row['nombre_asignatura'] = $this->nombre_asignatura->DefaultValue;
+        $row['id_profesor'] = $this->id_profesor->DefaultValue;
         return $row;
     }
 
@@ -1829,53 +1797,35 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
 
         // Common render codes for all row types
 
-        // nombre_alumno
+        // id_asignatura
 
-        // apellidos_alumno
+        // nombre_asignatura
 
-        // numcarnet_alumno
-
-        // id_alumno
-
-        // fk_id_asignatura
+        // id_profesor
 
         // View row
         if ($this->RowType == ROWTYPE_VIEW) {
-            // nombre_alumno
-            $this->nombre_alumno->ViewValue = $this->nombre_alumno->CurrentValue;
+            // id_asignatura
+            $this->id_asignatura->ViewValue = $this->id_asignatura->CurrentValue;
 
-            // apellidos_alumno
-            $this->apellidos_alumno->ViewValue = $this->apellidos_alumno->CurrentValue;
+            // nombre_asignatura
+            $this->nombre_asignatura->ViewValue = $this->nombre_asignatura->CurrentValue;
 
-            // numcarnet_alumno
-            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
+            // id_profesor
+            $this->id_profesor->ViewValue = $this->id_profesor->CurrentValue;
+            $this->id_profesor->ViewValue = FormatNumber($this->id_profesor->ViewValue, $this->id_profesor->formatPattern());
 
-            // id_alumno
-            $this->id_alumno->ViewValue = $this->id_alumno->CurrentValue;
+            // id_asignatura
+            $this->id_asignatura->HrefValue = "";
+            $this->id_asignatura->TooltipValue = "";
 
-            // fk_id_asignatura
-            $this->fk_id_asignatura->ViewValue = $this->fk_id_asignatura->CurrentValue;
-            $this->fk_id_asignatura->ViewValue = FormatNumber($this->fk_id_asignatura->ViewValue, $this->fk_id_asignatura->formatPattern());
+            // nombre_asignatura
+            $this->nombre_asignatura->HrefValue = "";
+            $this->nombre_asignatura->TooltipValue = "";
 
-            // nombre_alumno
-            $this->nombre_alumno->HrefValue = "";
-            $this->nombre_alumno->TooltipValue = "";
-
-            // apellidos_alumno
-            $this->apellidos_alumno->HrefValue = "";
-            $this->apellidos_alumno->TooltipValue = "";
-
-            // numcarnet_alumno
-            $this->numcarnet_alumno->HrefValue = "";
-            $this->numcarnet_alumno->TooltipValue = "";
-
-            // id_alumno
-            $this->id_alumno->HrefValue = "";
-            $this->id_alumno->TooltipValue = "";
-
-            // fk_id_asignatura
-            $this->fk_id_asignatura->HrefValue = "";
-            $this->fk_id_asignatura->TooltipValue = "";
+            // id_profesor
+            $this->id_profesor->HrefValue = "";
+            $this->id_profesor->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1896,19 +1846,19 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         }
         if (SameText($type, "excel")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"falumnosporasigntura_vwlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" form=\"fasignaturas_vwlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"excel\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToExcel") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcel", true)) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
             }
         } elseif (SameText($type, "word")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"falumnosporasigntura_vwlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" form=\"fasignaturas_vwlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"word\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToWord") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWord", true)) . "\">" . $Language->phrase("ExportToWord") . "</a>";
             }
         } elseif (SameText($type, "pdf")) {
             if ($custom) {
-                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"falumnosporasigntura_vwlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
+                return "<button type=\"button\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" form=\"fasignaturas_vwlist\" data-url=\"$exportUrl\" data-ew-action=\"export\" data-export=\"pdf\" data-custom=\"true\" data-export-selected=\"false\">" . $Language->phrase("ExportToPdf") . "</button>";
             } else {
                 return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPdf", true)) . "\">" . $Language->phrase("ExportToPdf") . "</a>";
             }
@@ -1920,7 +1870,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsv", true)) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
         } elseif (SameText($type, "email")) {
             $url = $custom ? ' data-url="' . $exportUrl . '"' : '';
-            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="falumnosporasigntura_vwlist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
+            return '<button type="button" class="btn btn-default ew-export-link ew-email" title="' . $Language->phrase("ExportToEmail", true) . '" data-caption="' . $Language->phrase("ExportToEmail", true) . '" form="fasignaturas_vwlist" data-ew-action="email" data-custom="false" data-hdr="' . $Language->phrase("ExportToEmail", true) . '" data-exported-selected="false"' . $url . '>' . $Language->phrase("ExportToEmail") . '</button>';
         } elseif (SameText($type, "print")) {
             return "<a href=\"$exportUrl\" class=\"btn btn-default ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendly", true)) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
         }
@@ -1998,7 +1948,7 @@ class AlumnosporasignturaVwList extends AlumnosporasignturaVw
         // Search button
         $item = &$this->SearchOptions->add("searchtoggle");
         $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"falumnosporasigntura_vwsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fasignaturas_vwsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
         $item->Visible = true;
 
         // Show all button

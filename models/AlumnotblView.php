@@ -674,25 +674,25 @@ class AlumnotblView extends Alumnotbl
         $detailCopyTblVar = "";
         $detailEditTblVar = "";
 
-        // "detail_calificacion_tbl"
-        $item = &$option->add("detail_calificacion_tbl");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("calificacion_tbl", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("CalificacionTblList?" . Config("TABLE_SHOW_MASTER") . "=alumnotbl&" . GetForeignKeyUrl("fk_id_alumno", $this->id_alumno->CurrentValue) . "")) . "\">" . $body . "</a>";
+        // "detail_alumnos_asignatura_tbl"
+        $item = &$option->add("detail_alumnos_asignatura_tbl");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("alumnos_asignatura_tbl", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("AlumnosAsignaturaTblList?" . Config("TABLE_SHOW_MASTER") . "=alumnotbl&" . GetForeignKeyUrl("fk_id_alumno", $this->id_alumno->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
-        $detailPageObj = Container("CalificacionTblGrid");
+        $detailPageObj = Container("AlumnosAsignaturaTblGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'alumnotbl')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=calificacion_tbl"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=alumnos_asignatura_tbl"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
             if ($detailViewTblVar != "") {
                 $detailViewTblVar .= ",";
             }
-            $detailViewTblVar .= "calificacion_tbl";
+            $detailViewTblVar .= "alumnos_asignatura_tbl";
         }
         if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'alumnotbl')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=calificacion_tbl"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=alumnos_asignatura_tbl"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
             if ($detailEditTblVar != "") {
                 $detailEditTblVar .= ",";
             }
-            $detailEditTblVar .= "calificacion_tbl";
+            $detailEditTblVar .= "alumnos_asignatura_tbl";
         }
         if ($links != "") {
             $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
@@ -702,12 +702,12 @@ class AlumnotblView extends Alumnotbl
         }
         $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
         $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'calificacion_tbl');
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'alumnos_asignatura_tbl');
         if ($item->Visible) {
             if ($detailTableLink != "") {
                 $detailTableLink .= ",";
             }
-            $detailTableLink .= "calificacion_tbl";
+            $detailTableLink .= "alumnos_asignatura_tbl";
         }
         if ($this->ShowMultipleDetails) {
             $item->Visible = false;
@@ -938,8 +938,8 @@ class AlumnotblView extends Alumnotbl
         }
         if ($detailTblVar != "") {
             $detailTblVar = explode(",", $detailTblVar);
-            if (in_array("calificacion_tbl", $detailTblVar)) {
-                $detailPageObj = Container("CalificacionTblGrid");
+            if (in_array("alumnos_asignatura_tbl", $detailTblVar)) {
+                $detailPageObj = Container("AlumnosAsignaturaTblGrid");
                 if ($detailPageObj->DetailView) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     $detailPageObj->CurrentMode = "view";
@@ -950,7 +950,6 @@ class AlumnotblView extends Alumnotbl
                     $detailPageObj->fk_id_alumno->IsDetailKey = true;
                     $detailPageObj->fk_id_alumno->CurrentValue = $this->id_alumno->CurrentValue;
                     $detailPageObj->fk_id_alumno->setSessionValue($detailPageObj->fk_id_alumno->CurrentValue);
-                    $detailPageObj->fk_id_asignatura->setSessionValue(""); // Clear session key
                 }
             }
         }

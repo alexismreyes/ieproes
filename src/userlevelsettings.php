@@ -27,7 +27,9 @@ $USER_LEVEL_PRIVS = [["{F73A7286-9F13-4725-9F3C-54E276C53E3B}alumnotbl","-2","0"
     ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}alumnosporasigntura_vw","-2","0"],
     ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}alumnosporasigntura_vw","0","0"],
     ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}evaluacion_tbl","-2","0"],
-    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}evaluacion_tbl","0","0"]];
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}evaluacion_tbl","0","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}asignaturas_vw","-2","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}asignaturas_vw","0","0"]];
 // User level table info
 $USER_LEVEL_TABLES = [["alumnotbl","alumnotbl","Alumnos",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AlumnotblList"],
     ["asignatura_tbl","asignatura_tbl","Asignaturas",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AsignaturaTblList"],
@@ -36,6 +38,7 @@ $USER_LEVEL_TABLES = [["alumnotbl","alumnotbl","Alumnos",true,"{F73A7286-9F13-47
     ["usuarios_tbl","usuarios_tbl","Usuarios",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","UsuariosTblList"],
     ["userlevelpermissions","userlevelpermissions","Permisos",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","UserlevelpermissionsList"],
     ["userlevels","userlevels","Tipos de usuario",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","UserlevelsList"],
-    ["alumnos_asignatura_tbl","alumnos_asignatura_tbl","Alumnos por asignatura",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AlumnosAsignaturaTblList"],
+    ["alumnos_asignatura_tbl","alumnos_asignatura_tbl","Asignaturas Cursadas",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AlumnosAsignaturaTblList"],
     ["alumnosporasigntura_vw","alumnosporasigntura_vw","alumnosporasigntura vw",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AlumnosporasignturaVwList"],
-    ["evaluacion_tbl","evaluacion_tbl","Tipos de evaluaciones",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","EvaluacionTblList"]];
+    ["evaluacion_tbl","evaluacion_tbl","Tipos de evaluaciones",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","EvaluacionTblList"],
+    ["asignaturas_vw","asignaturas_vw","asignaturas vw",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AsignaturasVwList"]];

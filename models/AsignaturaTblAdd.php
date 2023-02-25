@@ -929,10 +929,6 @@ class AsignaturaTblAdd extends AsignaturaTbl
         if (in_array("calificacion_tbl", $detailTblVar) && $detailPage->DetailAdd) {
             $validateForm = $validateForm && $detailPage->validateGridForm();
         }
-        $detailPage = Container("AlumnosAsignaturaTblGrid");
-        if (in_array("alumnos_asignatura_tbl", $detailTblVar) && $detailPage->DetailAdd) {
-            $validateForm = $validateForm && $detailPage->validateGridForm();
-        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1017,16 +1013,6 @@ class AsignaturaTblAdd extends AsignaturaTbl
                 $detailPage->fk_id_asignatura->setSessionValue(""); // Clear master key if insert failed
                 }
             }
-            $detailPage = Container("AlumnosAsignaturaTblGrid");
-            if (in_array("alumnos_asignatura_tbl", $detailTblVar) && $detailPage->DetailAdd) {
-                $detailPage->fk_id_asignatura->setSessionValue($this->id_asignatura->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "alumnos_asignatura_tbl"); // Load user level of detail table
-                $addRow = $detailPage->gridInsert();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                if (!$addRow) {
-                $detailPage->fk_id_asignatura->setSessionValue(""); // Clear master key if insert failed
-                }
-            }
         }
 
         // Commit/Rollback transaction
@@ -1079,26 +1065,6 @@ class AsignaturaTblAdd extends AsignaturaTbl
             $detailTblVar = explode(",", $detailTblVar);
             if (in_array("calificacion_tbl", $detailTblVar)) {
                 $detailPageObj = Container("CalificacionTblGrid");
-                if ($detailPageObj->DetailAdd) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    if ($this->CopyRecord) {
-                        $detailPageObj->CurrentMode = "copy";
-                    } else {
-                        $detailPageObj->CurrentMode = "add";
-                    }
-                    $detailPageObj->CurrentAction = "gridadd";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->fk_id_asignatura->IsDetailKey = true;
-                    $detailPageObj->fk_id_asignatura->CurrentValue = $this->id_asignatura->CurrentValue;
-                    $detailPageObj->fk_id_asignatura->setSessionValue($detailPageObj->fk_id_asignatura->CurrentValue);
-                    $detailPageObj->fk_id_alumno->setSessionValue(""); // Clear session key
-                }
-            }
-            if (in_array("alumnos_asignatura_tbl", $detailTblVar)) {
-                $detailPageObj = Container("AlumnosAsignaturaTblGrid");
                 if ($detailPageObj->DetailAdd) {
                     $detailPageObj->EventCancelled = $this->EventCancelled;
                     if ($this->CopyRecord) {

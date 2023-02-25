@@ -363,8 +363,8 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
         $this->View = Get(Config("VIEW"));
         $this->CurrentAction = Param("action"); // Set up current action
         $this->id_alumnosasignatura->Visible = false;
+        $this->fk_id_alumno->Visible = false;
         $this->fk_id_asignatura->setVisibility();
-        $this->fk_id_alumno->setVisibility();
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -389,8 +389,8 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
         }
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->fk_id_asignatura);
         $this->setupLookupOptions($this->fk_id_alumno);
+        $this->setupLookupOptions($this->fk_id_asignatura);
 
         // Set up master/detail parameters
         $this->setupMasterParms();
@@ -574,13 +574,8 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id_alumnosasignatura->setDbValue($row['id_alumnosasignatura']);
-        $this->fk_id_asignatura->setDbValue($row['fk_id_asignatura']);
         $this->fk_id_alumno->setDbValue($row['fk_id_alumno']);
-        if (array_key_exists('EV__fk_id_alumno', $row)) {
-            $this->fk_id_alumno->VirtualValue = $row['EV__fk_id_alumno']; // Set up virtual field value
-        } else {
-            $this->fk_id_alumno->VirtualValue = ""; // Clear value
-        }
+        $this->fk_id_asignatura->setDbValue($row['fk_id_asignatura']);
     }
 
     // Return a row with default values
@@ -588,8 +583,8 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
     {
         $row = [];
         $row['id_alumnosasignatura'] = $this->id_alumnosasignatura->DefaultValue;
-        $row['fk_id_asignatura'] = $this->fk_id_asignatura->DefaultValue;
         $row['fk_id_alumno'] = $this->fk_id_alumno->DefaultValue;
+        $row['fk_id_asignatura'] = $this->fk_id_asignatura->DefaultValue;
         return $row;
     }
 
@@ -608,19 +603,43 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
         // id_alumnosasignatura
         $this->id_alumnosasignatura->CellCssStyle = "white-space: nowrap;";
 
-        // fk_id_asignatura
-
         // fk_id_alumno
+
+        // fk_id_asignatura
 
         // View row
         if ($this->RowType == ROWTYPE_VIEW) {
+            // fk_id_alumno
+            $curVal = strval($this->fk_id_alumno->CurrentValue);
+            if ($curVal != "") {
+                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
+                if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCacheImpl($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
+                        $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
+                    } else {
+                        $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
+                    }
+                }
+            } else {
+                $this->fk_id_alumno->ViewValue = null;
+            }
+
             // fk_id_asignatura
             $curVal = strval($this->fk_id_asignatura->CurrentValue);
             if ($curVal != "") {
                 $this->fk_id_asignatura->ViewValue = $this->fk_id_asignatura->lookupCacheOption($curVal);
                 if ($this->fk_id_asignatura->ViewValue === null) { // Lookup from database
                     $filterWrk = SearchFilter("`id_asignatura`", "=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->fk_id_asignatura->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $lookupFilter = $this->fk_id_asignatura->getSelectFilter($this); // PHP
+                    $sqlWrk = $this->fk_id_asignatura->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $conn = Conn();
                     $config = $conn->getConfiguration();
                     $config->setResultCacheImpl($this->Cache);
@@ -637,41 +656,9 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
                 $this->fk_id_asignatura->ViewValue = null;
             }
 
-            // fk_id_alumno
-            if ($this->fk_id_alumno->VirtualValue != "") {
-                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->VirtualValue;
-            } else {
-                $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->CurrentValue;
-                $curVal = strval($this->fk_id_alumno->CurrentValue);
-                if ($curVal != "") {
-                    $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->lookupCacheOption($curVal);
-                    if ($this->fk_id_alumno->ViewValue === null) { // Lookup from database
-                        $filterWrk = SearchFilter("`id_alumno`", "=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->fk_id_alumno->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $conn = Conn();
-                        $config = $conn->getConfiguration();
-                        $config->setResultCacheImpl($this->Cache);
-                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->fk_id_alumno->Lookup->renderViewRow($rswrk[0]);
-                            $this->fk_id_alumno->ViewValue = $this->fk_id_alumno->displayValue($arwrk);
-                        } else {
-                            $this->fk_id_alumno->ViewValue = FormatNumber($this->fk_id_alumno->CurrentValue, $this->fk_id_alumno->formatPattern());
-                        }
-                    }
-                } else {
-                    $this->fk_id_alumno->ViewValue = null;
-                }
-            }
-
             // fk_id_asignatura
             $this->fk_id_asignatura->HrefValue = "";
             $this->fk_id_asignatura->TooltipValue = "";
-
-            // fk_id_alumno
-            $this->fk_id_alumno->HrefValue = "";
-            $this->fk_id_alumno->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -788,15 +775,15 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "asignatura_tbl") {
+            if ($masterTblVar == "alumnotbl") {
                 $validMaster = true;
-                $masterTbl = Container("asignatura_tbl");
-                if (($parm = Get("fk_id_asignatura", Get("fk_id_asignatura"))) !== null) {
-                    $masterTbl->id_asignatura->setQueryStringValue($parm);
-                    $this->fk_id_asignatura->QueryStringValue = $masterTbl->id_asignatura->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->fk_id_asignatura->setSessionValue($this->fk_id_asignatura->QueryStringValue);
-                    $foreignKeys["fk_id_asignatura"] = $this->fk_id_asignatura->QueryStringValue;
-                    if (!is_numeric($masterTbl->id_asignatura->QueryStringValue)) {
+                $masterTbl = Container("alumnotbl");
+                if (($parm = Get("fk_id_alumno", Get("fk_id_alumno"))) !== null) {
+                    $masterTbl->id_alumno->setQueryStringValue($parm);
+                    $this->fk_id_alumno->QueryStringValue = $masterTbl->id_alumno->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->fk_id_alumno->setSessionValue($this->fk_id_alumno->QueryStringValue);
+                    $foreignKeys["fk_id_alumno"] = $this->fk_id_alumno->QueryStringValue;
+                    if (!is_numeric($masterTbl->id_alumno->QueryStringValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -810,15 +797,15 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "asignatura_tbl") {
+            if ($masterTblVar == "alumnotbl") {
                 $validMaster = true;
-                $masterTbl = Container("asignatura_tbl");
-                if (($parm = Post("fk_id_asignatura", Post("fk_id_asignatura"))) !== null) {
-                    $masterTbl->id_asignatura->setFormValue($parm);
-                    $this->fk_id_asignatura->FormValue = $masterTbl->id_asignatura->FormValue;
-                    $this->fk_id_asignatura->setSessionValue($this->fk_id_asignatura->FormValue);
-                    $foreignKeys["fk_id_asignatura"] = $this->fk_id_asignatura->FormValue;
-                    if (!is_numeric($masterTbl->id_asignatura->FormValue)) {
+                $masterTbl = Container("alumnotbl");
+                if (($parm = Post("fk_id_alumno", Post("fk_id_alumno"))) !== null) {
+                    $masterTbl->id_alumno->setFormValue($parm);
+                    $this->fk_id_alumno->FormValue = $masterTbl->id_alumno->FormValue;
+                    $this->fk_id_alumno->setSessionValue($this->fk_id_alumno->FormValue);
+                    $foreignKeys["fk_id_alumno"] = $this->fk_id_alumno->FormValue;
+                    if (!is_numeric($masterTbl->id_alumno->FormValue)) {
                         $validMaster = false;
                     }
                 } else {
@@ -837,9 +824,9 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "asignatura_tbl") {
-                if (!array_key_exists("fk_id_asignatura", $foreignKeys)) { // Not current foreign key
-                    $this->fk_id_asignatura->setSessionValue("");
+            if ($masterTblVar != "alumnotbl") {
+                if (!array_key_exists("fk_id_alumno", $foreignKeys)) { // Not current foreign key
+                    $this->fk_id_alumno->setSessionValue("");
                 }
             }
         }
@@ -871,9 +858,10 @@ class AlumnosAsignaturaTblDelete extends AlumnosAsignaturaTbl
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
-                case "x_fk_id_asignatura":
-                    break;
                 case "x_fk_id_alumno":
+                    break;
+                case "x_fk_id_asignatura":
+                    $lookupFilter = $fld->getSelectFilter(); // PHP
                     break;
                 default:
                     $lookupFilter = "";
