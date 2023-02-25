@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ew-language version="19.5.0" id="en-US" name="English (US)" desc="English (US)" author="e.World Technology Limited" date="2023/2/24">
+<ew-language version="19.5.0" id="en-US" name="English (US)" desc="English (US)" author="e.World Technology Limited" date="2023/2/25">
   <!--
     IMPORTANT NOTES:
     1. Language ID must be RFC 4646 language tags (which use hyphen, not underscore), e.g. en-US, fr-CA, fr-FR,
@@ -1159,37 +1159,205 @@
   <project>
     <phrase id="footertext" value="&amp;copy;2022 e.World Technology Limited. All rights reserved." />
     <menu id="1">
-      <phrase id="menutext" value="alumnotbl" />
+      <phrase id="menutext" value="Alumnos" />
+    </menu>
+    <menu id="2">
+      <phrase id="menutext" value="Asignaturas" />
+    </menu>
+    <menu id="8">
+      <phrase id="menutext" value="Alumnos por asignatura" />
+    </menu>
+    <menu id="10">
+      <phrase id="menutext" value="Tipos de evaluaciones" />
+    </menu>
+    <menu id="3">
+      <phrase id="menutext" value="Calificaciones" />
+    </menu>
+    <menu id="4">
+      <phrase id="menutext" value="profesor tbl" />
+    </menu>
+    <menu id="5">
+      <phrase id="menutext" value="Usuarios" />
+    </menu>
+    <menu id="6">
+      <phrase id="menutext" value="Permisos" />
+    </menu>
+    <menu id="7">
+      <phrase id="menutext" value="Tipos de usuario" />
+    </menu>
+    <menu id="9">
+      <phrase id="menutext" value="alumnosporasigntura vw" />
     </menu>
     <table id="alumnotbl">
-      <phrase id="tblcaption" value="alumnotbl" />
+      <phrase id="tblcaption" value="Alumnos" />
       <field id="id_alumno">
         <phrase id="fldcaption" value="id alumno" />
       </field>
+      <field id="nombre_alumno">
+        <phrase id="fldcaption" value="Nombres" />
+      </field>
+      <field id="apellidos_alumno">
+        <phrase id="fldcaption" value="Apellidos" />
+      </field>
+      <field id="numcarnet_alumno">
+        <phrase id="fldcaption" value="Carnet" />
+      </field>
+      <field id="genero_alumno">
+        <phrase id="fldcaption" value="Genero" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Masculino" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="Femenino" />
+      </field>
+      <field id="fechanac_alumno">
+        <phrase id="fldcaption" value="Fecha Nacimiento" />
+      </field>
+      <field id="direccion_alumno">
+        <phrase id="fldcaption" value="Dirección" />
+      </field>
+      <field id="telefono_alumno">
+        <phrase id="fldcaption" value="Teléfono" />
+      </field>
+    </table>
+    <table id="asignatura_tbl">
+      <phrase id="tblcaption" value="Asignaturas" />
+      <field id="id_asignatura">
+        <phrase id="fldcaption" value="id asignatura" />
+      </field>
+      <field id="nombre_asignatura">
+        <phrase id="fldcaption" value="Nombre" />
+      </field>
+      <field id="id_profesor">
+        <phrase id="fldcaption" value="Responsable" />
+      </field>
+    </table>
+    <table id="calificacion_tbl">
+      <phrase id="tblcaption" value="Calificaciones" />
+      <field id="id_calificacion">
+        <phrase id="fldcaption" value="id calificacion" />
+      </field>
+      <field id="fk_id_asignatura">
+        <phrase id="fldcaption" value="Asignatura" />
+      </field>
+      <field id="fk_id_alumno">
+        <phrase id="fldcaption" value="Alumno" />
+      </field>
+      <field id="nota_calificacion">
+        <phrase id="fldcaption" value="Calificacion" />
+      </field>
+      <field id="observacion_calificacion">
+        <phrase id="fldcaption" value="Observacion" />
+      </field>
+      <field id="fk_id_evaluacion">
+        <phrase id="fldcaption" value="Evaluacion" />
+      </field>
+    </table>
+    <table id="profesor_tbl">
+      <phrase id="tblcaption" value="profesor tbl" />
+      <field id="id_profesor">
+        <phrase id="fldcaption" value="id profesor" />
+      </field>
+      <field id="nombre_profesor">
+        <phrase id="fldcaption" value="nombre profesor" />
+      </field>
+      <field id="dui_profesor">
+        <phrase id="fldcaption" value="dui profesor" />
+      </field>
+      <field id="direccion_profesor">
+        <phrase id="fldcaption" value="direccion profesor" />
+      </field>
+      <field id="telefono_profesor">
+        <phrase id="fldcaption" value="telefono profesor" />
+      </field>
+      <field id="email_profesor">
+        <phrase id="fldcaption" value="email profesor" />
+      </field>
+    </table>
+    <table id="usuarios_tbl">
+      <phrase id="tblcaption" value="Usuarios" />
+      <field id="id_usuario">
+        <phrase id="fldcaption" value="id usuario" />
+      </field>
+      <field id="tipo_usuario">
+        <phrase id="fldcaption" value="Tipo de Usuario" />
+      </field>
+      <field id="nombre_usuario">
+        <phrase id="fldcaption" value="Nombre real" />
+      </field>
+      <field id="login_usuario">
+        <phrase id="fldcaption" value="Login" />
+      </field>
+      <field id="password_usuario">
+        <phrase id="fldcaption" value="Password" />
+      </field>
+      <field id="email_usuario">
+        <phrase id="fldcaption" value="Email" />
+      </field>
+      <field id="parent_id_usuario">
+        <phrase id="fldcaption" value="parent id usuario" />
+      </field>
+    </table>
+    <table id="userlevelpermissions">
+      <phrase id="tblcaption" value="Permisos" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="User Level ID" />
+      </field>
+      <field id="_tablename">
+        <phrase id="fldcaption" value="Table Name" />
+      </field>
+      <field id="_permission">
+        <phrase id="fldcaption" value="Permission" />
+      </field>
+    </table>
+    <table id="userlevels">
+      <phrase id="tblcaption" value="Tipos de usuario" />
+      <field id="userlevelid">
+        <phrase id="fldcaption" value="User Level ID" />
+      </field>
+      <field id="userlevelname">
+        <phrase id="fldcaption" value="User Level Name" />
+      </field>
+    </table>
+    <table id="alumnos_asignatura_tbl">
+      <phrase id="tblcaption" value="Alumnos por asignatura" />
+      <field id="id_alumnosasignatura">
+        <phrase id="fldcaption" value="id alumnosasignatura" />
+      </field>
+      <field id="fk_id_asignatura">
+        <phrase id="fldcaption" value="Asignatura" />
+      </field>
+      <field id="fk_id_alumno">
+        <phrase id="fldcaption" value="Alumno" />
+      </field>
+    </table>
+    <table id="alumnosporasigntura_vw">
+      <phrase id="tblcaption" value="alumnosporasigntura vw" />
       <field id="nombre_alumno">
         <phrase id="fldcaption" value="nombre alumno" />
       </field>
       <field id="apellidos_alumno">
         <phrase id="fldcaption" value="apellidos alumno" />
       </field>
-      <field id="genero_alumno">
-        <phrase id="fldcaption" value="genero alumno" />
-        <phrase id="fldtagvalue1" value="1" />
-        <phrase id="fldtagcaption1" value="Yes" />
-        <phrase id="fldtagvalue2" value="0" />
-        <phrase id="fldtagcaption2" value="No" />
-      </field>
-      <field id="fechanac_alumno">
-        <phrase id="fldcaption" value="fechanac alumno" />
-      </field>
-      <field id="direccion_alumno">
-        <phrase id="fldcaption" value="direccion alumno" />
-      </field>
-      <field id="telefono_alumno">
-        <phrase id="fldcaption" value="telefono alumno" />
-      </field>
       <field id="numcarnet_alumno">
         <phrase id="fldcaption" value="numcarnet alumno" />
+      </field>
+      <field id="id_alumno">
+        <phrase id="fldcaption" value="id alumno" />
+      </field>
+      <field id="fk_id_asignatura">
+        <phrase id="fldcaption" value="fk id asignatura" />
+      </field>
+    </table>
+    <table id="evaluacion_tbl">
+      <phrase id="tblcaption" value="Tipos de evaluaciones" />
+      <field id="id_evaluacion">
+        <phrase id="fldcaption" value="id evaluacion" />
+      </field>
+      <field id="nombre_evaluacion">
+        <phrase id="fldcaption" value="Evaluacion" />
+      </field>
+      <field id="descripcion_evaluacion">
+        <phrase id="fldcaption" value="Descripcion" />
       </field>
     </table>
   </project>

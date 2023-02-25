@@ -24,11 +24,11 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["nombre_alumno", [fields.nombre_alumno.visible && fields.nombre_alumno.required ? ew.Validators.required(fields.nombre_alumno.caption) : null], fields.nombre_alumno.isInvalid],
             ["apellidos_alumno", [fields.apellidos_alumno.visible && fields.apellidos_alumno.required ? ew.Validators.required(fields.apellidos_alumno.caption) : null], fields.apellidos_alumno.isInvalid],
+            ["numcarnet_alumno", [fields.numcarnet_alumno.visible && fields.numcarnet_alumno.required ? ew.Validators.required(fields.numcarnet_alumno.caption) : null], fields.numcarnet_alumno.isInvalid],
             ["genero_alumno", [fields.genero_alumno.visible && fields.genero_alumno.required ? ew.Validators.required(fields.genero_alumno.caption) : null], fields.genero_alumno.isInvalid],
             ["fechanac_alumno", [fields.fechanac_alumno.visible && fields.fechanac_alumno.required ? ew.Validators.required(fields.fechanac_alumno.caption) : null, ew.Validators.datetime(fields.fechanac_alumno.clientFormatPattern)], fields.fechanac_alumno.isInvalid],
             ["direccion_alumno", [fields.direccion_alumno.visible && fields.direccion_alumno.required ? ew.Validators.required(fields.direccion_alumno.caption) : null], fields.direccion_alumno.isInvalid],
-            ["telefono_alumno", [fields.telefono_alumno.visible && fields.telefono_alumno.required ? ew.Validators.required(fields.telefono_alumno.caption) : null], fields.telefono_alumno.isInvalid],
-            ["numcarnet_alumno", [fields.numcarnet_alumno.visible && fields.numcarnet_alumno.required ? ew.Validators.required(fields.numcarnet_alumno.caption) : null], fields.numcarnet_alumno.isInvalid]
+            ["telefono_alumno", [fields.telefono_alumno.visible && fields.telefono_alumno.required ? ew.Validators.required(fields.telefono_alumno.caption) : null], fields.telefono_alumno.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -98,16 +98,45 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
+<?php if ($Page->numcarnet_alumno->Visible) { // numcarnet_alumno ?>
+    <div id="r_numcarnet_alumno"<?= $Page->numcarnet_alumno->rowAttributes() ?>>
+        <label id="elh_alumnotbl_numcarnet_alumno" for="x_numcarnet_alumno" class="<?= $Page->LeftColumnClass ?>"><?= $Page->numcarnet_alumno->caption() ?><?= $Page->numcarnet_alumno->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->numcarnet_alumno->cellAttributes() ?>>
+<span id="el_alumnotbl_numcarnet_alumno">
+<input type="<?= $Page->numcarnet_alumno->getInputTextType() ?>" name="x_numcarnet_alumno" id="x_numcarnet_alumno" data-table="alumnotbl" data-field="x_numcarnet_alumno" value="<?= $Page->numcarnet_alumno->EditValue ?>" size="30" maxlength="10" placeholder="<?= HtmlEncode($Page->numcarnet_alumno->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->numcarnet_alumno->formatPattern()) ?>"<?= $Page->numcarnet_alumno->editAttributes() ?> aria-describedby="x_numcarnet_alumno_help">
+<?= $Page->numcarnet_alumno->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->numcarnet_alumno->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
 <?php if ($Page->genero_alumno->Visible) { // genero_alumno ?>
     <div id="r_genero_alumno"<?= $Page->genero_alumno->rowAttributes() ?>>
         <label id="elh_alumnotbl_genero_alumno" class="<?= $Page->LeftColumnClass ?>"><?= $Page->genero_alumno->caption() ?><?= $Page->genero_alumno->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->genero_alumno->cellAttributes() ?>>
 <span id="el_alumnotbl_genero_alumno">
-<div class="form-check d-inline-block">
-    <input type="checkbox" class="form-check-input<?= $Page->genero_alumno->isInvalidClass() ?>" data-table="alumnotbl" data-field="x_genero_alumno" data-boolean name="x_genero_alumno" id="x_genero_alumno" value="1"<?= ConvertToBool($Page->genero_alumno->CurrentValue) ? " checked" : "" ?><?= $Page->genero_alumno->editAttributes() ?> aria-describedby="x_genero_alumno_help">
-    <div class="invalid-feedback"><?= $Page->genero_alumno->getErrorMessage() ?></div>
-</div>
+<template id="tp_x_genero_alumno">
+    <div class="form-check">
+        <input type="radio" class="form-check-input" data-table="alumnotbl" data-field="x_genero_alumno" name="x_genero_alumno" id="x_genero_alumno"<?= $Page->genero_alumno->editAttributes() ?>>
+        <label class="form-check-label"></label>
+    </div>
+</template>
+<div id="dsl_x_genero_alumno" class="ew-item-list"></div>
+<selection-list hidden
+    id="x_genero_alumno"
+    name="x_genero_alumno"
+    value="<?= HtmlEncode($Page->genero_alumno->CurrentValue) ?>"
+    data-type="select-one"
+    data-template="tp_x_genero_alumno"
+    data-target="dsl_x_genero_alumno"
+    data-repeatcolumn="5"
+    class="form-control<?= $Page->genero_alumno->isInvalidClass() ?>"
+    data-table="alumnotbl"
+    data-field="x_genero_alumno"
+    data-value-separator="<?= $Page->genero_alumno->displayValueSeparatorAttribute() ?>"
+    <?= $Page->genero_alumno->editAttributes() ?>></selection-list>
 <?= $Page->genero_alumno->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->genero_alumno->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>
@@ -123,7 +152,7 @@ $Page->showMessage();
 <?php if (!$Page->fechanac_alumno->ReadOnly && !$Page->fechanac_alumno->Disabled && !isset($Page->fechanac_alumno->EditAttrs["readonly"]) && !isset($Page->fechanac_alumno->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["falumnotbladd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
+    let format = "<?= DateFormat(14) ?>",
         options = {
             localization: {
                 locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
@@ -178,19 +207,15 @@ loadjs.ready(["falumnotbladd", "datetimepicker"], function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->numcarnet_alumno->Visible) { // numcarnet_alumno ?>
-    <div id="r_numcarnet_alumno"<?= $Page->numcarnet_alumno->rowAttributes() ?>>
-        <label id="elh_alumnotbl_numcarnet_alumno" for="x_numcarnet_alumno" class="<?= $Page->LeftColumnClass ?>"><?= $Page->numcarnet_alumno->caption() ?><?= $Page->numcarnet_alumno->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->numcarnet_alumno->cellAttributes() ?>>
-<span id="el_alumnotbl_numcarnet_alumno">
-<input type="<?= $Page->numcarnet_alumno->getInputTextType() ?>" name="x_numcarnet_alumno" id="x_numcarnet_alumno" data-table="alumnotbl" data-field="x_numcarnet_alumno" value="<?= $Page->numcarnet_alumno->EditValue ?>" size="30" maxlength="10" placeholder="<?= HtmlEncode($Page->numcarnet_alumno->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->numcarnet_alumno->formatPattern()) ?>"<?= $Page->numcarnet_alumno->editAttributes() ?> aria-describedby="x_numcarnet_alumno_help">
-<?= $Page->numcarnet_alumno->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->numcarnet_alumno->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("calificacion_tbl", explode(",", $Page->getCurrentDetailTable())) && $calificacion_tbl->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("calificacion_tbl", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "CalificacionTblGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="falumnotbladd"><?= $Language->phrase("AddBtn") ?></button>

@@ -57,7 +57,7 @@ class ChartJsRenderer implements ChartRendererInterface
             "yAxisFormat" => $yAxisFormat,
             "useDrilldownPanel" => null
         ];
-        if ($this->Chart->DrillDownUrl != "") {
+        if ($this->Chart->DrillDownUrl != "" && AllowList(PROJECT_ID . $this->Chart->DrillDownTable)) {
             $args["useDrilldownPanel"] = $this->Chart->UseDrillDownPanel;
         }
         if ($this->Chart->isPieChart() || $this->Chart->isDoughnutChart()) {

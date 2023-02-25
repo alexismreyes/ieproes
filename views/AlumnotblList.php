@@ -83,6 +83,7 @@ loadjs.ready(["wrapper", "head"], function () {
 });
 </script>
 <input type="hidden" name="cmd" value="search">
+<?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
 <div class="row mb-0">
@@ -106,6 +107,7 @@ loadjs.ready(["wrapper", "head"], function () {
     </div>
 </div>
 </div><!-- /.ew-extended-search -->
+<?php } ?>
 <?php } ?>
 </div><!-- /.ew-search-panel -->
 </form>
@@ -142,14 +144,14 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->id_alumno->Visible) { // id_alumno ?>
-        <th data-name="id_alumno" class="<?= $Page->id_alumno->headerCellClass() ?>"><div id="elh_alumnotbl_id_alumno" class="alumnotbl_id_alumno"><?= $Page->renderFieldHeader($Page->id_alumno) ?></div></th>
-<?php } ?>
 <?php if ($Page->nombre_alumno->Visible) { // nombre_alumno ?>
         <th data-name="nombre_alumno" class="<?= $Page->nombre_alumno->headerCellClass() ?>"><div id="elh_alumnotbl_nombre_alumno" class="alumnotbl_nombre_alumno"><?= $Page->renderFieldHeader($Page->nombre_alumno) ?></div></th>
 <?php } ?>
 <?php if ($Page->apellidos_alumno->Visible) { // apellidos_alumno ?>
         <th data-name="apellidos_alumno" class="<?= $Page->apellidos_alumno->headerCellClass() ?>"><div id="elh_alumnotbl_apellidos_alumno" class="alumnotbl_apellidos_alumno"><?= $Page->renderFieldHeader($Page->apellidos_alumno) ?></div></th>
+<?php } ?>
+<?php if ($Page->numcarnet_alumno->Visible) { // numcarnet_alumno ?>
+        <th data-name="numcarnet_alumno" class="<?= $Page->numcarnet_alumno->headerCellClass() ?>"><div id="elh_alumnotbl_numcarnet_alumno" class="alumnotbl_numcarnet_alumno"><?= $Page->renderFieldHeader($Page->numcarnet_alumno) ?></div></th>
 <?php } ?>
 <?php if ($Page->genero_alumno->Visible) { // genero_alumno ?>
         <th data-name="genero_alumno" class="<?= $Page->genero_alumno->headerCellClass() ?>"><div id="elh_alumnotbl_genero_alumno" class="alumnotbl_genero_alumno"><?= $Page->renderFieldHeader($Page->genero_alumno) ?></div></th>
@@ -162,9 +164,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->telefono_alumno->Visible) { // telefono_alumno ?>
         <th data-name="telefono_alumno" class="<?= $Page->telefono_alumno->headerCellClass() ?>"><div id="elh_alumnotbl_telefono_alumno" class="alumnotbl_telefono_alumno"><?= $Page->renderFieldHeader($Page->telefono_alumno) ?></div></th>
-<?php } ?>
-<?php if ($Page->numcarnet_alumno->Visible) { // numcarnet_alumno ?>
-        <th data-name="numcarnet_alumno" class="<?= $Page->numcarnet_alumno->headerCellClass() ?>"><div id="elh_alumnotbl_numcarnet_alumno" class="alumnotbl_numcarnet_alumno"><?= $Page->renderFieldHeader($Page->numcarnet_alumno) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -185,14 +184,6 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->id_alumno->Visible) { // id_alumno ?>
-        <td data-name="id_alumno"<?= $Page->id_alumno->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_alumnotbl_id_alumno" class="el_alumnotbl_id_alumno">
-<span<?= $Page->id_alumno->viewAttributes() ?>>
-<?= $Page->id_alumno->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->nombre_alumno->Visible) { // nombre_alumno ?>
         <td data-name="nombre_alumno"<?= $Page->nombre_alumno->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_alumnotbl_nombre_alumno" class="el_alumnotbl_nombre_alumno">
@@ -209,14 +200,19 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->numcarnet_alumno->Visible) { // numcarnet_alumno ?>
+        <td data-name="numcarnet_alumno"<?= $Page->numcarnet_alumno->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_alumnotbl_numcarnet_alumno" class="el_alumnotbl_numcarnet_alumno">
+<span<?= $Page->numcarnet_alumno->viewAttributes() ?>>
+<?= $Page->numcarnet_alumno->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->genero_alumno->Visible) { // genero_alumno ?>
         <td data-name="genero_alumno"<?= $Page->genero_alumno->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_alumnotbl_genero_alumno" class="el_alumnotbl_genero_alumno">
 <span<?= $Page->genero_alumno->viewAttributes() ?>>
-<div class="form-check d-inline-block">
-    <input type="checkbox" id="x_genero_alumno_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->genero_alumno->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->genero_alumno->CurrentValue)) { ?> checked<?php } ?>>
-    <label class="form-check-label" for="x_genero_alumno_<?= $Page->RowCount ?>"></label>
-</div></span>
+<?= $Page->genero_alumno->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -241,14 +237,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_alumnotbl_telefono_alumno" class="el_alumnotbl_telefono_alumno">
 <span<?= $Page->telefono_alumno->viewAttributes() ?>>
 <?= $Page->telefono_alumno->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->numcarnet_alumno->Visible) { // numcarnet_alumno ?>
-        <td data-name="numcarnet_alumno"<?= $Page->numcarnet_alumno->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_alumnotbl_numcarnet_alumno" class="el_alumnotbl_numcarnet_alumno">
-<span<?= $Page->numcarnet_alumno->viewAttributes() ?>>
-<?= $Page->numcarnet_alumno->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -153,6 +153,52 @@ ew.ready("head", [
 <script type="text/html" class="ew-js-template" data-name="languages" data-seq="10" data-data="languages" data-method="<?= $Language->Method ?>" data-target="<?= HtmlEncode($Language->Target) ?>">
 <?= $Language->getTemplate() ?>
 </script>
+<script type="text/html" class="ew-js-template" data-name="login" data-seq="10" data-data="login" data-method="appendTo" data-target=".navbar-nav.ms-auto">
+{{if canSubscribe}}
+<li class="nav-item"><a id="subscribe-notification" class="nav-link disabled">{{:subscribeText}}</a></li>
+{{/if}}
+{{if isLoggedIn}}
+<li class="nav-item dropdown text-body">
+    <a id="ew-nav-link-user" class="nav-link ew-user" data-bs-toggle="dropdown" href="#">
+        <i class="fa-solid fa-user"></i>
+    </a>
+    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="ew-nav-link-user">
+        <div class="dropdown-header">
+            <i class="fa-solid fa-user me-2"></i>{{:currentUserName}}
+        </div>
+        <div class="dropdown-divider"></div>
+        {{if hasPersonalData}}
+        <a class="dropdown-item" id="personal-data"{{props personalData}} data-{{:key}}="{{>prop}}"{{/props}}>{{:personalDataText}}</a>
+        {{/if}}
+        {{if canChangePassword}}
+        <a class="dropdown-item" id="change-password"{{props changePassword}} data-{{:key}}="{{>prop}}"{{/props}}>{{:changePasswordText}}</a>
+        {{/if}}
+        {{if enable2FAText}}
+        <a class="dropdown-item{{if !enable2FA}} d-none{{/if}}" id="enable-2fa" data-ew-action="enable-2fa">{{:enable2FAText}}</a>
+        {{/if}}
+        {{if backupCodes}}
+        <a class="dropdown-item{{if !showBackupCodes}} d-none{{/if}}" id="backup-codes" data-ew-action="backup-codes">{{:backupCodes}}</a>
+        {{/if}}
+        {{if disable2FAText}}
+        <a class="dropdown-item{{if !disable2FA}} d-none{{/if}}" id="disable-2fa" data-ew-action="disable-2fa">{{:disable2FAText}}</a>
+        {{/if}}
+        {{if canLogout}}
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-footer text-end py-0">
+            <a class="btn btn-default"{{props logout}} data-{{:key}}="{{>prop}}"{{/props}}>{{:logoutText}}</a>
+        </div>
+        {{/if}}
+    </div>
+</li>
+{{else}}
+    {{if canLogin}}
+<li class="nav-item"><a class="nav-link ew-tooltip" title="{{:loginTitle}}"{{props login}} data-{{:key}}="{{>prop}}"{{/props}}>{{:loginText}}</a></li>
+    {{/if}}
+    {{if canLogout}}
+<li class="nav-item"><a class="nav-link ew-tooltip"{{props logout}} data-{{:key}}="{{>prop}}"{{/props}}>{{:logoutText}}</a></li>
+    {{/if}}
+{{/if}}
+</script>
 <meta name="generator" content="PHPMaker 2023.5.0">
 </head>
 <body class="<?= Config("BODY_CLASS") ?>">
@@ -326,6 +372,8 @@ loadjs.done("wrapper");
 </script>
 <!-- modal dialog -->
 <div id="ew-modal-dialog" class="modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="ew-modal-dialog-title" aria-hidden="true"><div class="modal-dialog modal-fullscreen-sm-down"><div class="modal-content"><div class="modal-header"><h5 id="ew-modal-dialog-title" class="modal-title"></h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?= $Language->phrase("CloseBtn") ?>"></button></div><div class="modal-body"></div><div class="modal-footer"></div></div></div></div>
+<!-- add option dialog -->
+<div id="ew-add-opt-dialog" class="modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="ew-add-opt-dialog-title" aria-hidden="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 id="ew-add-opt-dialog-title" class="modal-title"></h5></div><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-primary ew-btn"><?= $Language->phrase("AddBtn") ?></button><button type="button" class="btn btn-default ew-btn" data-bs-dismiss="modal"><?= $Language->phrase("CancelBtn") ?></button></div></div></div></div>
 <!-- image cropper dialog -->
 <div id="ew-cropper-dialog" class="modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="ew-cropper-dialog-title" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-fullscreen-sm-down">

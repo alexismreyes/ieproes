@@ -65,8 +65,91 @@ class ApiPermissionMiddleware
         $UserProfile = Container("profile");
         $Security = Container("security");
 
-        // No security
-        $authorised = true;
+        // Default no permission
+        $authorised = false;
+
+        // Actions for table
+        $apiTableActions = [
+            Config("API_EXPORT_ACTION"),
+            Config("API_LIST_ACTION"),
+            Config("API_VIEW_ACTION"),
+            Config("API_ADD_ACTION"),
+            Config("API_EDIT_ACTION"),
+            Config("API_DELETE_ACTION"),
+            Config("API_FILE_ACTION")
+        ];
+
+        // Check permission
+        if (
+            in_array($action, $checkTokenActions) || // Token checked
+            in_array($action, array_keys($GLOBALS["API_ACTIONS"])) || // Custom actions (deprecated)
+            $action == Config("API_REGISTER_ACTION") || // Register
+            $action == Config("API_PERMISSIONS_ACTION") && $request->getMethod() == "GET" || // Permissions (GET)
+            $action == Config("API_PERMISSIONS_ACTION") && $request->getMethod() == "POST" && $Security->isAdmin() || // Permissions (POST)
+            $action == Config("API_UPLOAD_ACTION") && $Security->isLoggedIn() || // Upload
+            $action == Config("API_METADATA_ACTION") // Metadata
+        ) {
+            $authorised = true;
+        } elseif (in_array($action, $apiTableActions) && $table != "") { // Table actions
+            $Security->loadTablePermissions($table);
+            $authorised = $action == Config("API_LIST_ACTION") && $Security->canList() ||
+                $action == Config("API_EXPORT_ACTION") && $Security->canExport() ||
+                $action == Config("API_VIEW_ACTION") && $Security->canView() ||
+                $action == Config("API_ADD_ACTION") && $Security->canAdd() ||
+                $action == Config("API_EDIT_ACTION") && $Security->canEdit() ||
+                $action == Config("API_DELETE_ACTION") && $Security->canDelete() ||
+                $action == Config("API_FILE_ACTION") && ($Security->canList() || $Security->canView());
+        } elseif ($action == Config("API_EXPORT_ACTION") && EmptyValue($table)) { // Get exported file
+            $authorised = true; // Check table permission in ExportHandler.php
+        } elseif ($action == Config("API_LOOKUP_ACTION")) { // Lookup
+            $canLookup = function ($params) use ($Security) {
+                $object = $params[Config("API_LOOKUP_PAGE")]; // Get lookup page
+                $page = Container($object);
+                if ($page !== null) {
+                    $fieldName = $params[Config("API_FIELD_NAME")]; // Get field name
+                    $lookupField = $page->Fields[$fieldName] ?? null;
+                    if ($lookupField) {
+                        $lookup = $lookupField->Lookup;
+                        if ($lookup) {
+                            $tbl = $lookup->getTable();
+                            if ($tbl) {
+                                $Security->loadTablePermissions($tbl->TableVar);
+                                return $Security->canLookup();
+                            }
+                        }
+                    }
+                }
+            };
+            if ($request->getContentType() == "application/json") { // Multiple lookup requests in JSON
+                $parsedBody = $request->getParsedBody();
+                if (is_array($parsedBody)) {
+                    $authorised = ArraySome($canLookup, $parsedBody);
+                }
+            } else { // Single lookup request
+                $authorised = $canLookup($request->getParams());
+            }
+        } elseif ($action == Config("API_PUSH_NOTIFICATION_ACTION")) { // Push notification
+            $parm = count($routeValues) >= 1 ? $routeValues[0] : null;
+            if ($parm == Config("API_PUSH_NOTIFICATION_SUBSCRIBE") || $parm == Config("API_PUSH_NOTIFICATION_DELETE")) {
+                $authorised = Config("PUSH_ANONYMOUS") || $Security->isLoggedIn();
+            } elseif ($parm == Config("API_PUSH_NOTIFICATION_SEND")) {
+                $Security->loadTablePermissions(Config("SUBSCRIPTION_TABLE"));
+                $authorised = $Security->canPush();
+            }
+        } elseif ($action == Config("API_2FA_ACTION")) { // Two factor authentication
+            $parm = count($routeValues) >= 1 ? $routeValues[0] : null;
+            if ($parm == Config("API_2FA_SHOW")) {
+                $authorized = true;
+            } elseif ($action == Config("API_2FA_VERIFY")) {
+                $authorized = $Security->isLoggingIn2FA();
+            } elseif ($action == Config("API_2FA_RESET")) {
+                $authorized = $Security->IsSysAdmin();
+            } elseif ($action == Config("API_2FA_BACKUP_CODES") || $action == Config("API_2FA_NEW_BACKUP_CODES")) {
+                $authorized = $Security->isLoggedIn() && !$Security->isSysAdmin();
+            } elseif ($action == Config("API_2FA_SEND_OTP")) {
+                $authorized = $Security->isLoggingIn2FA() && !$Security->isSysAdmin();
+            }
+        }
         if (!$authorised) {
             return $response->withStatus(401); // Not authorized
         }

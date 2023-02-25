@@ -53,17 +53,6 @@ loadjs.ready(["wrapper", "head"], function () {
 <input type="hidden" name="t" value="alumnotbl">
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <table class="<?= $Page->TableClass ?>">
-<?php if ($Page->id_alumno->Visible) { // id_alumno ?>
-    <tr id="r_id_alumno"<?= $Page->id_alumno->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_alumnotbl_id_alumno"><?= $Page->id_alumno->caption() ?></span></td>
-        <td data-name="id_alumno"<?= $Page->id_alumno->cellAttributes() ?>>
-<span id="el_alumnotbl_id_alumno">
-<span<?= $Page->id_alumno->viewAttributes() ?>>
-<?= $Page->id_alumno->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->nombre_alumno->Visible) { // nombre_alumno ?>
     <tr id="r_nombre_alumno"<?= $Page->nombre_alumno->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_alumnotbl_nombre_alumno"><?= $Page->nombre_alumno->caption() ?></span></td>
@@ -86,16 +75,24 @@ loadjs.ready(["wrapper", "head"], function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->numcarnet_alumno->Visible) { // numcarnet_alumno ?>
+    <tr id="r_numcarnet_alumno"<?= $Page->numcarnet_alumno->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_alumnotbl_numcarnet_alumno"><?= $Page->numcarnet_alumno->caption() ?></span></td>
+        <td data-name="numcarnet_alumno"<?= $Page->numcarnet_alumno->cellAttributes() ?>>
+<span id="el_alumnotbl_numcarnet_alumno">
+<span<?= $Page->numcarnet_alumno->viewAttributes() ?>>
+<?= $Page->numcarnet_alumno->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->genero_alumno->Visible) { // genero_alumno ?>
     <tr id="r_genero_alumno"<?= $Page->genero_alumno->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_alumnotbl_genero_alumno"><?= $Page->genero_alumno->caption() ?></span></td>
         <td data-name="genero_alumno"<?= $Page->genero_alumno->cellAttributes() ?>>
 <span id="el_alumnotbl_genero_alumno">
 <span<?= $Page->genero_alumno->viewAttributes() ?>>
-<div class="form-check d-inline-block">
-    <input type="checkbox" id="x_genero_alumno_<?= $Page->RowCount ?>" class="form-check-input" value="<?= $Page->genero_alumno->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->genero_alumno->CurrentValue)) { ?> checked<?php } ?>>
-    <label class="form-check-label" for="x_genero_alumno_<?= $Page->RowCount ?>"></label>
-</div></span>
+<?= $Page->genero_alumno->getViewValue() ?></span>
 </span>
 </td>
     </tr>
@@ -133,18 +130,15 @@ loadjs.ready(["wrapper", "head"], function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->numcarnet_alumno->Visible) { // numcarnet_alumno ?>
-    <tr id="r_numcarnet_alumno"<?= $Page->numcarnet_alumno->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_alumnotbl_numcarnet_alumno"><?= $Page->numcarnet_alumno->caption() ?></span></td>
-        <td data-name="numcarnet_alumno"<?= $Page->numcarnet_alumno->cellAttributes() ?>>
-<span id="el_alumnotbl_numcarnet_alumno">
-<span<?= $Page->numcarnet_alumno->viewAttributes() ?>>
-<?= $Page->numcarnet_alumno->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 </table>
+<?php
+    if (in_array("calificacion_tbl", explode(",", $Page->getCurrentDetailTable())) && $calificacion_tbl->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("calificacion_tbl", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "CalificacionTblGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

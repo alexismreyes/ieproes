@@ -117,7 +117,7 @@ class AlumnotblDelete extends Alumnotbl
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'alumnotbl';
         $this->TableName = 'alumnotbl';
 
@@ -148,6 +148,9 @@ class AlumnotblDelete extends Alumnotbl
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
     }
 
     // Get content from stream
@@ -359,14 +362,14 @@ class AlumnotblDelete extends Alumnotbl
         // View
         $this->View = Get(Config("VIEW"));
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id_alumno->setVisibility();
+        $this->id_alumno->Visible = false;
         $this->nombre_alumno->setVisibility();
         $this->apellidos_alumno->setVisibility();
+        $this->numcarnet_alumno->setVisibility();
         $this->genero_alumno->setVisibility();
         $this->fechanac_alumno->setVisibility();
         $this->direccion_alumno->setVisibility();
         $this->telefono_alumno->setVisibility();
-        $this->numcarnet_alumno->setVisibility();
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -465,6 +468,9 @@ class AlumnotblDelete extends Alumnotbl
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -571,11 +577,11 @@ class AlumnotblDelete extends Alumnotbl
         $this->id_alumno->setDbValue($row['id_alumno']);
         $this->nombre_alumno->setDbValue($row['nombre_alumno']);
         $this->apellidos_alumno->setDbValue($row['apellidos_alumno']);
+        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
         $this->genero_alumno->setDbValue($row['genero_alumno']);
         $this->fechanac_alumno->setDbValue($row['fechanac_alumno']);
         $this->direccion_alumno->setDbValue($row['direccion_alumno']);
         $this->telefono_alumno->setDbValue($row['telefono_alumno']);
-        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
     }
 
     // Return a row with default values
@@ -585,11 +591,11 @@ class AlumnotblDelete extends Alumnotbl
         $row['id_alumno'] = $this->id_alumno->DefaultValue;
         $row['nombre_alumno'] = $this->nombre_alumno->DefaultValue;
         $row['apellidos_alumno'] = $this->apellidos_alumno->DefaultValue;
+        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
         $row['genero_alumno'] = $this->genero_alumno->DefaultValue;
         $row['fechanac_alumno'] = $this->fechanac_alumno->DefaultValue;
         $row['direccion_alumno'] = $this->direccion_alumno->DefaultValue;
         $row['telefono_alumno'] = $this->telefono_alumno->DefaultValue;
-        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
         return $row;
     }
 
@@ -611,6 +617,8 @@ class AlumnotblDelete extends Alumnotbl
 
         // apellidos_alumno
 
+        // numcarnet_alumno
+
         // genero_alumno
 
         // fechanac_alumno
@@ -619,24 +627,22 @@ class AlumnotblDelete extends Alumnotbl
 
         // telefono_alumno
 
-        // numcarnet_alumno
-
         // View row
         if ($this->RowType == ROWTYPE_VIEW) {
-            // id_alumno
-            $this->id_alumno->ViewValue = $this->id_alumno->CurrentValue;
-
             // nombre_alumno
             $this->nombre_alumno->ViewValue = $this->nombre_alumno->CurrentValue;
 
             // apellidos_alumno
             $this->apellidos_alumno->ViewValue = $this->apellidos_alumno->CurrentValue;
 
+            // numcarnet_alumno
+            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
+
             // genero_alumno
             if (ConvertToBool($this->genero_alumno->CurrentValue)) {
-                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Yes";
+                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Masculino";
             } else {
-                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "No";
+                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "Femenino";
             }
 
             // fechanac_alumno
@@ -649,13 +655,6 @@ class AlumnotblDelete extends Alumnotbl
             // telefono_alumno
             $this->telefono_alumno->ViewValue = $this->telefono_alumno->CurrentValue;
 
-            // numcarnet_alumno
-            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
-
-            // id_alumno
-            $this->id_alumno->HrefValue = "";
-            $this->id_alumno->TooltipValue = "";
-
             // nombre_alumno
             $this->nombre_alumno->HrefValue = "";
             $this->nombre_alumno->TooltipValue = "";
@@ -663,6 +662,10 @@ class AlumnotblDelete extends Alumnotbl
             // apellidos_alumno
             $this->apellidos_alumno->HrefValue = "";
             $this->apellidos_alumno->TooltipValue = "";
+
+            // numcarnet_alumno
+            $this->numcarnet_alumno->HrefValue = "";
+            $this->numcarnet_alumno->TooltipValue = "";
 
             // genero_alumno
             $this->genero_alumno->HrefValue = "";
@@ -679,10 +682,6 @@ class AlumnotblDelete extends Alumnotbl
             // telefono_alumno
             $this->telefono_alumno->HrefValue = "";
             $this->telefono_alumno->TooltipValue = "";
-
-            // numcarnet_alumno
-            $this->numcarnet_alumno->HrefValue = "";
-            $this->numcarnet_alumno->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -695,6 +694,10 @@ class AlumnotblDelete extends Alumnotbl
     protected function deleteRows()
     {
         global $Language, $Security;
+        if (!$Security->canDelete()) {
+            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
+            return false;
+        }
         $sql = $this->getCurrentSql();
         $conn = $this->getConnection();
         $rows = $conn->fetchAllAssociative($sql);

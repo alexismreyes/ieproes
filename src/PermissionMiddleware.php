@@ -54,6 +54,62 @@ class PermissionMiddleware
             $GLOBALS["Table"] = Container($table);
         }
 
+        // Auto login
+        if (!$Security->isLoggedIn() && !IsPasswordReset() && !IsPasswordExpired() && !IsLoggingIn2FA()) {
+            $Security->autoLogin();
+        }
+
+        // Validate security
+        if (isset($table) && $table != "") { // Table level
+            $Security->loadTablePermissions($table);
+            if (
+                $pageAction == Config("VIEW_ACTION") && !$Security->canView() ||
+                in_array($pageAction, [Config("EDIT_ACTION"), Config("UPDATE_ACTION")]) && !$Security->canEdit() ||
+                $pageAction == Config("ADD_ACTION") && !$Security->canAdd() ||
+                $pageAction == Config("DELETE_ACTION") && !$Security->canDelete() ||
+                in_array($pageAction, [Config("SEARCH_ACTION"), Config("QUERY_ACTION")]) && !$Security->canSearch()
+            ) {
+                $Security->saveLastUrl();
+                $_SESSION[SESSION_FAILURE_MESSAGE] = DeniedMessage(); // Set no permission
+                if ($Security->canList()) { // Back to list
+                    $pageAction = Config("LIST_ACTION");
+                    $routeName = $GLOBALS["Table"]->getListUrl();
+                    return $this->getRedirectResponse($request, $response, $routeName . "-" . $table . "-" . $pageAction);
+                } else {
+                    return $this->getRedirectResponse($request, $response);
+                }
+            } elseif (
+                $pageAction == Config("LIST_ACTION") && !$Security->canList() || // List Permission
+                in_array($pageAction, [Config("CUSTOM_REPORT_ACTION"), Config("SUMMARY_REPORT_ACTION"), Config("CROSSTAB_REPORT_ACTION"), Config("DASHBOARD_REPORT_ACTION"), Config("CALENDAR_REPORT_ACTION")]) && !$Security->canList()
+            ) { // No permission
+                $Security->saveLastUrl();
+                $_SESSION[SESSION_FAILURE_MESSAGE] = DeniedMessage(); // Set no permission
+                return $this->getRedirectResponse($request, $response);
+            }
+        } else { // Others
+            if ($pageAction == "changepassword") { // Change password
+                if (!IsPasswordReset() && !IsPasswordExpired()) {
+                    if (!$Security->isLoggedIn() || $Security->isSysAdmin()) {
+                        return $this->getRedirectResponse($request, $response);
+                    }
+                }
+            } elseif ($pageAction == "personaldata") { // Personal data
+                if (!$Security->isLoggedIn() || $Security->isSysAdmin()) {
+                    $_SESSION[SESSION_FAILURE_MESSAGE] = DeniedMessage(); // Set no permission
+                    return $this->getRedirectResponse($request, $response);
+                }
+            } elseif ($pageAction == "userpriv") { // User priv
+                $table = "userlevels";
+                $pageAction = Config("LIST_ACTION");
+                $routeName = Container($table)->getListUrl();
+                $Security->loadTablePermissions($table);
+                if (!$Security->isLoggedIn() || !$Security->isAdmin()) {
+                    $_SESSION[SESSION_FAILURE_MESSAGE] = DeniedMessage(); // Set no permission
+                    return $this->getRedirectResponse($request, $response, $routeName . "-" . $table . "-" . $pageAction);
+                }
+            }
+        }
+
         // Validate CSRF
         if (Config("CHECK_TOKEN") && !IsSamlResponse()) {
             if (!ValidateCsrf($request)) {

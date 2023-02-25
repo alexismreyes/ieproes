@@ -135,7 +135,7 @@ class AlumnotblView extends Alumnotbl
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'alumnotbl';
         $this->TableName = 'alumnotbl';
 
@@ -171,6 +171,9 @@ class AlumnotblView extends Alumnotbl
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
 
         // Export options
         $this->ExportOptions = new ListOptions(["TagClassName" => "ew-export-option"]);
@@ -491,11 +494,11 @@ class AlumnotblView extends Alumnotbl
         $this->id_alumno->setVisibility();
         $this->nombre_alumno->setVisibility();
         $this->apellidos_alumno->setVisibility();
+        $this->numcarnet_alumno->setVisibility();
         $this->genero_alumno->setVisibility();
         $this->fechanac_alumno->setVisibility();
         $this->direccion_alumno->setVisibility();
         $this->telefono_alumno->setVisibility();
-        $this->numcarnet_alumno->setVisibility();
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -583,6 +586,9 @@ class AlumnotblView extends Alumnotbl
         $this->resetAttributes();
         $this->renderRow();
 
+        // Set up detail parameters
+        $this->setupDetailParms();
+
         // Normal return
         if (IsApi()) {
             if (!$this->isExport()) {
@@ -596,6 +602,9 @@ class AlumnotblView extends Alumnotbl
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -639,7 +648,7 @@ class AlumnotblView extends Alumnotbl
         } else {
             $item->Body = "<a class=\"ew-action ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("ViewPageAddLink") . "</a>";
         }
-        $item->Visible = $this->AddUrl != "";
+        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
 
         // Edit
         $item = &$option->add("edit");
@@ -649,17 +658,7 @@ class AlumnotblView extends Alumnotbl
         } else {
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
-        $item->Visible = $this->EditUrl != "";
-
-        // Copy
-        $item = &$option->add("copy");
-        $copycaption = HtmlTitle($Language->phrase("ViewPageCopyLink"));
-        if ($this->IsModal) {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-action ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("ViewPageCopyLink") . "</a>";
-        }
-        $item->Visible = $this->CopyUrl != "";
+        $item->Visible = $this->EditUrl != "" && $Security->canEdit();
 
         // Delete
         $item = &$option->add("delete");
@@ -668,7 +667,85 @@ class AlumnotblView extends Alumnotbl
             ($this->InlineDelete || $this->IsModal ? " data-ew-action=\"inline-delete\"" : "") .
             " title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) .
             "\" href=\"" . HtmlEncode($url) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
-        $item->Visible = $this->DeleteUrl != "";
+        $item->Visible = $this->DeleteUrl != "" && $Security->canDelete();
+        $option = $options["detail"];
+        $detailTableLink = "";
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_calificacion_tbl"
+        $item = &$option->add("detail_calificacion_tbl");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("calificacion_tbl", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("CalificacionTblList?" . Config("TABLE_SHOW_MASTER") . "=alumnotbl&" . GetForeignKeyUrl("fk_id_alumno", $this->id_alumno->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("CalificacionTblGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'alumnotbl')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=calificacion_tbl"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "calificacion_tbl";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'alumnotbl')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=calificacion_tbl"))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "calificacion_tbl";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'calificacion_tbl');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "calificacion_tbl";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar))) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode(GetUrl($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar))) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $item = &$option->add("details");
+            $item->Body = $body;
+        }
+
+        // Set up detail default
+        $option = $options["detail"];
+        $options["detail"]->DropDownButtonPhrase = $Language->phrase("ButtonDetails");
+        $ar = explode(",", $detailTableLink);
+        $cnt = count($ar);
+        $option->UseDropDownButton = ($cnt > 1);
+        $option->UseButtonGroup = true;
+        $item = &$option->addGroupOption();
+        $item->Body = "";
+        $item->Visible = false;
 
         // Set up action default
         $option = $options["action"];
@@ -730,11 +807,11 @@ class AlumnotblView extends Alumnotbl
         $this->id_alumno->setDbValue($row['id_alumno']);
         $this->nombre_alumno->setDbValue($row['nombre_alumno']);
         $this->apellidos_alumno->setDbValue($row['apellidos_alumno']);
+        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
         $this->genero_alumno->setDbValue($row['genero_alumno']);
         $this->fechanac_alumno->setDbValue($row['fechanac_alumno']);
         $this->direccion_alumno->setDbValue($row['direccion_alumno']);
         $this->telefono_alumno->setDbValue($row['telefono_alumno']);
-        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
     }
 
     // Return a row with default values
@@ -744,11 +821,11 @@ class AlumnotblView extends Alumnotbl
         $row['id_alumno'] = $this->id_alumno->DefaultValue;
         $row['nombre_alumno'] = $this->nombre_alumno->DefaultValue;
         $row['apellidos_alumno'] = $this->apellidos_alumno->DefaultValue;
+        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
         $row['genero_alumno'] = $this->genero_alumno->DefaultValue;
         $row['fechanac_alumno'] = $this->fechanac_alumno->DefaultValue;
         $row['direccion_alumno'] = $this->direccion_alumno->DefaultValue;
         $row['telefono_alumno'] = $this->telefono_alumno->DefaultValue;
-        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
         return $row;
     }
 
@@ -776,6 +853,8 @@ class AlumnotblView extends Alumnotbl
 
         // apellidos_alumno
 
+        // numcarnet_alumno
+
         // genero_alumno
 
         // fechanac_alumno
@@ -784,24 +863,22 @@ class AlumnotblView extends Alumnotbl
 
         // telefono_alumno
 
-        // numcarnet_alumno
-
         // View row
         if ($this->RowType == ROWTYPE_VIEW) {
-            // id_alumno
-            $this->id_alumno->ViewValue = $this->id_alumno->CurrentValue;
-
             // nombre_alumno
             $this->nombre_alumno->ViewValue = $this->nombre_alumno->CurrentValue;
 
             // apellidos_alumno
             $this->apellidos_alumno->ViewValue = $this->apellidos_alumno->CurrentValue;
 
+            // numcarnet_alumno
+            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
+
             // genero_alumno
             if (ConvertToBool($this->genero_alumno->CurrentValue)) {
-                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Yes";
+                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Masculino";
             } else {
-                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "No";
+                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "Femenino";
             }
 
             // fechanac_alumno
@@ -814,13 +891,6 @@ class AlumnotblView extends Alumnotbl
             // telefono_alumno
             $this->telefono_alumno->ViewValue = $this->telefono_alumno->CurrentValue;
 
-            // numcarnet_alumno
-            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
-
-            // id_alumno
-            $this->id_alumno->HrefValue = "";
-            $this->id_alumno->TooltipValue = "";
-
             // nombre_alumno
             $this->nombre_alumno->HrefValue = "";
             $this->nombre_alumno->TooltipValue = "";
@@ -828,6 +898,10 @@ class AlumnotblView extends Alumnotbl
             // apellidos_alumno
             $this->apellidos_alumno->HrefValue = "";
             $this->apellidos_alumno->TooltipValue = "";
+
+            // numcarnet_alumno
+            $this->numcarnet_alumno->HrefValue = "";
+            $this->numcarnet_alumno->TooltipValue = "";
 
             // genero_alumno
             $this->genero_alumno->HrefValue = "";
@@ -844,15 +918,41 @@ class AlumnotblView extends Alumnotbl
             // telefono_alumno
             $this->telefono_alumno->HrefValue = "";
             $this->telefono_alumno->TooltipValue = "";
-
-            // numcarnet_alumno
-            $this->numcarnet_alumno->HrefValue = "";
-            $this->numcarnet_alumno->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
+        }
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("calificacion_tbl", $detailTblVar)) {
+                $detailPageObj = Container("CalificacionTblGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->fk_id_alumno->IsDetailKey = true;
+                    $detailPageObj->fk_id_alumno->CurrentValue = $this->id_alumno->CurrentValue;
+                    $detailPageObj->fk_id_alumno->setSessionValue($detailPageObj->fk_id_alumno->CurrentValue);
+                    $detailPageObj->fk_id_asignatura->setSessionValue(""); // Clear session key
+                }
+            }
         }
     }
 

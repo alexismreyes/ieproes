@@ -141,7 +141,7 @@ class AlumnotblList extends Alumnotbl
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->FormActionName = Config("FORM_ROW_ACTION_NAME");
         $this->FormBlankRowName = Config("FORM_BLANK_ROW_NAME");
         $this->FormKeyCountName = Config("FORM_KEY_COUNT_NAME");
@@ -175,7 +175,7 @@ class AlumnotblList extends Alumnotbl
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "AlumnotblAdd";
+        $this->AddUrl = "AlumnotblAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -196,6 +196,9 @@ class AlumnotblList extends Alumnotbl
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
 
         // List options
         $this->ListOptions = new ListOptions(["Tag" => "td", "TableVar" => $this->TableVar]);
@@ -635,14 +638,14 @@ class AlumnotblList extends Alumnotbl
 
         // Set up list options
         $this->setupListOptions();
-        $this->id_alumno->setVisibility();
+        $this->id_alumno->Visible = false;
         $this->nombre_alumno->setVisibility();
         $this->apellidos_alumno->setVisibility();
+        $this->numcarnet_alumno->setVisibility();
         $this->genero_alumno->setVisibility();
         $this->fechanac_alumno->setVisibility();
         $this->direccion_alumno->setVisibility();
         $this->telefono_alumno->setVisibility();
-        $this->numcarnet_alumno->setVisibility();
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -804,6 +807,9 @@ class AlumnotblList extends Alumnotbl
 
         // Build filter
         $filter = "";
+        if (!$Security->canList()) {
+            $filter = "(0=1)"; // Filter all records
+        }
         AddFilter($filter, $this->DbDetailFilter);
         AddFilter($filter, $this->SearchWhere);
 
@@ -852,6 +858,9 @@ class AlumnotblList extends Alumnotbl
 
             // Set no record found message
             if ((EmptyValue($this->CurrentAction) || $this->isSearch()) && $this->TotalRecords == 0) {
+                if (!$Security->canList()) {
+                    $this->setWarningMessage(DeniedMessage());
+                }
                 if ($this->SearchWhere == "0=101") {
                     $this->setWarningMessage($Language->phrase("EnterSearchCriteria"));
                 } else {
@@ -914,6 +923,9 @@ class AlumnotblList extends Alumnotbl
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -998,14 +1010,13 @@ class AlumnotblList extends Alumnotbl
         // Initialize
         $filterList = "";
         $savedFilterList = "";
-        $filterList = Concat($filterList, $this->id_alumno->AdvancedSearch->toJson(), ","); // Field id_alumno
         $filterList = Concat($filterList, $this->nombre_alumno->AdvancedSearch->toJson(), ","); // Field nombre_alumno
         $filterList = Concat($filterList, $this->apellidos_alumno->AdvancedSearch->toJson(), ","); // Field apellidos_alumno
+        $filterList = Concat($filterList, $this->numcarnet_alumno->AdvancedSearch->toJson(), ","); // Field numcarnet_alumno
         $filterList = Concat($filterList, $this->genero_alumno->AdvancedSearch->toJson(), ","); // Field genero_alumno
         $filterList = Concat($filterList, $this->fechanac_alumno->AdvancedSearch->toJson(), ","); // Field fechanac_alumno
         $filterList = Concat($filterList, $this->direccion_alumno->AdvancedSearch->toJson(), ","); // Field direccion_alumno
         $filterList = Concat($filterList, $this->telefono_alumno->AdvancedSearch->toJson(), ","); // Field telefono_alumno
-        $filterList = Concat($filterList, $this->numcarnet_alumno->AdvancedSearch->toJson(), ","); // Field numcarnet_alumno
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1046,14 +1057,6 @@ class AlumnotblList extends Alumnotbl
         $filter = json_decode(Post("filter"), true);
         $this->Command = "search";
 
-        // Field id_alumno
-        $this->id_alumno->AdvancedSearch->SearchValue = @$filter["x_id_alumno"];
-        $this->id_alumno->AdvancedSearch->SearchOperator = @$filter["z_id_alumno"];
-        $this->id_alumno->AdvancedSearch->SearchCondition = @$filter["v_id_alumno"];
-        $this->id_alumno->AdvancedSearch->SearchValue2 = @$filter["y_id_alumno"];
-        $this->id_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_id_alumno"];
-        $this->id_alumno->AdvancedSearch->save();
-
         // Field nombre_alumno
         $this->nombre_alumno->AdvancedSearch->SearchValue = @$filter["x_nombre_alumno"];
         $this->nombre_alumno->AdvancedSearch->SearchOperator = @$filter["z_nombre_alumno"];
@@ -1069,6 +1072,14 @@ class AlumnotblList extends Alumnotbl
         $this->apellidos_alumno->AdvancedSearch->SearchValue2 = @$filter["y_apellidos_alumno"];
         $this->apellidos_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_apellidos_alumno"];
         $this->apellidos_alumno->AdvancedSearch->save();
+
+        // Field numcarnet_alumno
+        $this->numcarnet_alumno->AdvancedSearch->SearchValue = @$filter["x_numcarnet_alumno"];
+        $this->numcarnet_alumno->AdvancedSearch->SearchOperator = @$filter["z_numcarnet_alumno"];
+        $this->numcarnet_alumno->AdvancedSearch->SearchCondition = @$filter["v_numcarnet_alumno"];
+        $this->numcarnet_alumno->AdvancedSearch->SearchValue2 = @$filter["y_numcarnet_alumno"];
+        $this->numcarnet_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_numcarnet_alumno"];
+        $this->numcarnet_alumno->AdvancedSearch->save();
 
         // Field genero_alumno
         $this->genero_alumno->AdvancedSearch->SearchValue = @$filter["x_genero_alumno"];
@@ -1101,14 +1112,6 @@ class AlumnotblList extends Alumnotbl
         $this->telefono_alumno->AdvancedSearch->SearchValue2 = @$filter["y_telefono_alumno"];
         $this->telefono_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_telefono_alumno"];
         $this->telefono_alumno->AdvancedSearch->save();
-
-        // Field numcarnet_alumno
-        $this->numcarnet_alumno->AdvancedSearch->SearchValue = @$filter["x_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->SearchOperator = @$filter["z_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->SearchCondition = @$filter["v_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->SearchValue2 = @$filter["y_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->SearchOperator2 = @$filter["w_numcarnet_alumno"];
-        $this->numcarnet_alumno->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1142,14 +1145,17 @@ class AlumnotblList extends Alumnotbl
     {
         global $Security;
         $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
 
         // Fields to search
         $searchFlds = [];
         $searchFlds[] = &$this->nombre_alumno;
         $searchFlds[] = &$this->apellidos_alumno;
+        $searchFlds[] = &$this->numcarnet_alumno;
         $searchFlds[] = &$this->direccion_alumno;
         $searchFlds[] = &$this->telefono_alumno;
-        $searchFlds[] = &$this->numcarnet_alumno;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1218,7 +1224,7 @@ class AlumnotblList extends Alumnotbl
     {
         // Load default Sorting Order
         if ($this->Command != "json") {
-            $defaultSort = ""; // Set up default sort
+            $defaultSort = $this->nombre_alumno->Expression . " ASC"; // Set up default sort
             if ($this->getSessionOrderBy() == "" && $defaultSort != "") {
                 $this->setSessionOrderBy($defaultSort);
             }
@@ -1228,14 +1234,13 @@ class AlumnotblList extends Alumnotbl
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id_alumno); // id_alumno
             $this->updateSort($this->nombre_alumno); // nombre_alumno
             $this->updateSort($this->apellidos_alumno); // apellidos_alumno
+            $this->updateSort($this->numcarnet_alumno); // numcarnet_alumno
             $this->updateSort($this->genero_alumno); // genero_alumno
             $this->updateSort($this->fechanac_alumno); // fechanac_alumno
             $this->updateSort($this->direccion_alumno); // direccion_alumno
             $this->updateSort($this->telefono_alumno); // telefono_alumno
-            $this->updateSort($this->numcarnet_alumno); // numcarnet_alumno
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1263,11 +1268,11 @@ class AlumnotblList extends Alumnotbl
                 $this->id_alumno->setSort("");
                 $this->nombre_alumno->setSort("");
                 $this->apellidos_alumno->setSort("");
+                $this->numcarnet_alumno->setSort("");
                 $this->genero_alumno->setSort("");
                 $this->fechanac_alumno->setSort("");
                 $this->direccion_alumno->setSort("");
                 $this->telefono_alumno->setSort("");
-                $this->numcarnet_alumno->setSort("");
             }
 
             // Reset start position
@@ -1290,26 +1295,42 @@ class AlumnotblList extends Alumnotbl
         // "view"
         $item = &$this->ListOptions->add("view");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canView();
         $item->OnLeft = false;
 
         // "edit"
         $item = &$this->ListOptions->add("edit");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
-        $item->OnLeft = false;
-
-        // "copy"
-        $item = &$this->ListOptions->add("copy");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
 
         // "delete"
         $item = &$this->ListOptions->add("delete");
         $item->CssClass = "text-nowrap";
-        $item->Visible = true;
+        $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
+
+        // "detail_calificacion_tbl"
+        $item = &$this->ListOptions->add("detail_calificacion_tbl");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'calificacion_tbl');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("calificacion_tbl");
+        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1372,7 +1393,7 @@ class AlumnotblList extends Alumnotbl
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if (true) {
+            if ($Security->canView()) {
                 if ($this->ModalView && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-table=\"alumnotbl\" data-caption=\"" . $viewcaption . "\" data-ew-action=\"modal\" data-action=\"view\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\" data-btn=\"null\">" . $Language->phrase("ViewLink") . "</a>";
                 } else {
@@ -1385,7 +1406,7 @@ class AlumnotblList extends Alumnotbl
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if (true) {
+            if ($Security->canEdit()) {
                 if ($this->ModalEdit && !IsMobile()) {
                     $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . $editcaption . "\" data-table=\"alumnotbl\" data-caption=\"" . $editcaption . "\" data-ew-action=\"modal\" data-action=\"edit\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\" data-btn=\"SaveBtn\">" . $Language->phrase("EditLink") . "</a>";
                 } else {
@@ -1395,22 +1416,9 @@ class AlumnotblList extends Alumnotbl
                 $opt->Body = "";
             }
 
-            // "copy"
-            $opt = $this->ListOptions["copy"];
-            $copycaption = HtmlTitle($Language->phrase("CopyLink"));
-            if (true) {
-                if ($this->ModalAdd && !IsMobile()) {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-table=\"alumnotbl\" data-caption=\"" . $copycaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("CopyLink") . "</a>";
-                } else {
-                    $opt->Body = "<a class=\"ew-row-link ew-copy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . HtmlEncode(GetUrl($this->CopyUrl)) . "\">" . $Language->phrase("CopyLink") . "</a>";
-                }
-            } else {
-                $opt->Body = "";
-            }
-
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if (true) {
+            if ($Security->canDelete()) {
                 $deleteCaption = $Language->phrase("DeleteLink");
                 $deleteTitle = HtmlTitle($deleteCaption);
                 if ($this->UseAjaxActions) {
@@ -1458,6 +1466,68 @@ class AlumnotblList extends Alumnotbl
                 $opt->Body = $body;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_calificacion_tbl"
+        $opt = $this->ListOptions["detail_calificacion_tbl"];
+        if ($Security->allowList(CurrentProjectID() . 'calificacion_tbl')) {
+            $body = $Language->phrase("DetailLink") . $Language->TablePhrase("calificacion_tbl", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("CalificacionTblList?" . Config("TABLE_SHOW_MASTER") . "=alumnotbl&" . GetForeignKeyUrl("fk_id_alumno", $this->id_alumno->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("CalificacionTblGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'alumnotbl')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=calificacion_tbl");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "calificacion_tbl";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'alumnotbl')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=calificacion_tbl");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "calificacion_tbl";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->GetCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
@@ -1490,7 +1560,38 @@ class AlumnotblList extends Alumnotbl
         } else {
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
-        $item->Visible = $this->AddUrl != "";
+        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        $option = $options["detail"];
+        $detailTableLink = "";
+                $item = &$option->add("detailadd_calificacion_tbl");
+                $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=calificacion_tbl");
+                $detailPage = Container("CalificacionTblGrid");
+                $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+                $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+                $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'alumnotbl') && $Security->canAdd());
+                if ($item->Visible) {
+                    if ($detailTableLink != "") {
+                        $detailTableLink .= ",";
+                    }
+                    $detailTableLink .= "calificacion_tbl";
+                }
+
+        // Add multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$option->add("detailsadd");
+            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
+            $caption = $Language->phrase("AddMasterDetailLink");
+            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+            $item->Visible = $detailTableLink != "" && $Security->canAdd();
+            // Hide single master/detail items
+            $ar = explode(",", $detailTableLink);
+            $cnt = count($ar);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($item = $option["detailadd_" . $ar[$i]]) {
+                    $item->Visible = false;
+                }
+            }
+        }
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1499,14 +1600,13 @@ class AlumnotblList extends Alumnotbl
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
-            $option->add("id_alumno", $this->createColumnOption("id_alumno"));
             $option->add("nombre_alumno", $this->createColumnOption("nombre_alumno"));
             $option->add("apellidos_alumno", $this->createColumnOption("apellidos_alumno"));
+            $option->add("numcarnet_alumno", $this->createColumnOption("numcarnet_alumno"));
             $option->add("genero_alumno", $this->createColumnOption("genero_alumno"));
             $option->add("fechanac_alumno", $this->createColumnOption("fechanac_alumno"));
             $option->add("direccion_alumno", $this->createColumnOption("direccion_alumno"));
             $option->add("telefono_alumno", $this->createColumnOption("telefono_alumno"));
-            $option->add("numcarnet_alumno", $this->createColumnOption("numcarnet_alumno"));
         }
 
         // Set up options default
@@ -1891,11 +1991,11 @@ class AlumnotblList extends Alumnotbl
         $this->id_alumno->setDbValue($row['id_alumno']);
         $this->nombre_alumno->setDbValue($row['nombre_alumno']);
         $this->apellidos_alumno->setDbValue($row['apellidos_alumno']);
+        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
         $this->genero_alumno->setDbValue($row['genero_alumno']);
         $this->fechanac_alumno->setDbValue($row['fechanac_alumno']);
         $this->direccion_alumno->setDbValue($row['direccion_alumno']);
         $this->telefono_alumno->setDbValue($row['telefono_alumno']);
-        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
     }
 
     // Return a row with default values
@@ -1905,11 +2005,11 @@ class AlumnotblList extends Alumnotbl
         $row['id_alumno'] = $this->id_alumno->DefaultValue;
         $row['nombre_alumno'] = $this->nombre_alumno->DefaultValue;
         $row['apellidos_alumno'] = $this->apellidos_alumno->DefaultValue;
+        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
         $row['genero_alumno'] = $this->genero_alumno->DefaultValue;
         $row['fechanac_alumno'] = $this->fechanac_alumno->DefaultValue;
         $row['direccion_alumno'] = $this->direccion_alumno->DefaultValue;
         $row['telefono_alumno'] = $this->telefono_alumno->DefaultValue;
-        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
         return $row;
     }
 
@@ -1956,6 +2056,8 @@ class AlumnotblList extends Alumnotbl
 
         // apellidos_alumno
 
+        // numcarnet_alumno
+
         // genero_alumno
 
         // fechanac_alumno
@@ -1964,24 +2066,22 @@ class AlumnotblList extends Alumnotbl
 
         // telefono_alumno
 
-        // numcarnet_alumno
-
         // View row
         if ($this->RowType == ROWTYPE_VIEW) {
-            // id_alumno
-            $this->id_alumno->ViewValue = $this->id_alumno->CurrentValue;
-
             // nombre_alumno
             $this->nombre_alumno->ViewValue = $this->nombre_alumno->CurrentValue;
 
             // apellidos_alumno
             $this->apellidos_alumno->ViewValue = $this->apellidos_alumno->CurrentValue;
 
+            // numcarnet_alumno
+            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
+
             // genero_alumno
             if (ConvertToBool($this->genero_alumno->CurrentValue)) {
-                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Yes";
+                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Masculino";
             } else {
-                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "No";
+                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "Femenino";
             }
 
             // fechanac_alumno
@@ -1994,13 +2094,6 @@ class AlumnotblList extends Alumnotbl
             // telefono_alumno
             $this->telefono_alumno->ViewValue = $this->telefono_alumno->CurrentValue;
 
-            // numcarnet_alumno
-            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
-
-            // id_alumno
-            $this->id_alumno->HrefValue = "";
-            $this->id_alumno->TooltipValue = "";
-
             // nombre_alumno
             $this->nombre_alumno->HrefValue = "";
             $this->nombre_alumno->TooltipValue = "";
@@ -2008,6 +2101,10 @@ class AlumnotblList extends Alumnotbl
             // apellidos_alumno
             $this->apellidos_alumno->HrefValue = "";
             $this->apellidos_alumno->TooltipValue = "";
+
+            // numcarnet_alumno
+            $this->numcarnet_alumno->HrefValue = "";
+            $this->numcarnet_alumno->TooltipValue = "";
 
             // genero_alumno
             $this->genero_alumno->HrefValue = "";
@@ -2024,10 +2121,6 @@ class AlumnotblList extends Alumnotbl
             // telefono_alumno
             $this->telefono_alumno->HrefValue = "";
             $this->telefono_alumno->TooltipValue = "";
-
-            // numcarnet_alumno
-            $this->numcarnet_alumno->HrefValue = "";
-            $this->numcarnet_alumno->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2071,6 +2164,10 @@ class AlumnotblList extends Alumnotbl
         // Hide search options
         if ($this->isExport() || $this->CurrentAction && $this->CurrentAction != "search") {
             $this->SearchOptions->hideAllOptions();
+        }
+        if (!$Security->canSearch()) {
+            $this->SearchOptions->hideAllOptions();
+            $this->FilterOptions->hideAllOptions();
         }
     }
 

@@ -117,7 +117,7 @@ class AlumnotblEdit extends Alumnotbl
     public function __construct()
     {
         parent::__construct();
-        global $Language, $DashboardReport, $DebugTimer;
+        global $Language, $DashboardReport, $DebugTimer, $UserTable;
         $this->TableVar = 'alumnotbl';
         $this->TableName = 'alumnotbl';
 
@@ -148,6 +148,9 @@ class AlumnotblEdit extends Alumnotbl
 
         // Open connection
         $GLOBALS["Conn"] ??= $this->getConnection();
+
+        // User table object
+        $UserTable = Container("usertable");
     }
 
     // Get content from stream
@@ -458,14 +461,14 @@ class AlumnotblEdit extends Alumnotbl
         // Create form object
         $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
-        $this->id_alumno->setVisibility();
+        $this->id_alumno->Visible = false;
         $this->nombre_alumno->setVisibility();
         $this->apellidos_alumno->setVisibility();
+        $this->numcarnet_alumno->setVisibility();
         $this->genero_alumno->setVisibility();
         $this->fechanac_alumno->setVisibility();
         $this->direccion_alumno->setVisibility();
         $this->telefono_alumno->setVisibility();
-        $this->numcarnet_alumno->setVisibility();
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -559,6 +562,9 @@ class AlumnotblEdit extends Alumnotbl
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
+
+            // Set up detail parameters
+            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -585,9 +591,16 @@ class AlumnotblEdit extends Alumnotbl
                         $this->terminate("AlumnotblList"); // No matching record, return to list
                         return;
                     }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
+                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+                } else {
+                    $returnUrl = $this->getReturnUrl();
+                }
                 if (GetPageName($returnUrl) == "AlumnotblList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -625,6 +638,9 @@ class AlumnotblEdit extends Alumnotbl
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -638,6 +654,9 @@ class AlumnotblEdit extends Alumnotbl
 
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
+            // Setup login status
+            SetupLoginStatus();
+
             // Pass login status to client side
             SetClientVar("login", LoginStatus());
 
@@ -669,12 +688,6 @@ class AlumnotblEdit extends Alumnotbl
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'id_alumno' first before field var 'x_id_alumno'
-        $val = $CurrentForm->hasValue("id_alumno") ? $CurrentForm->getValue("id_alumno") : $CurrentForm->getValue("x_id_alumno");
-        if (!$this->id_alumno->IsDetailKey) {
-            $this->id_alumno->setFormValue($val);
-        }
-
         // Check field name 'nombre_alumno' first before field var 'x_nombre_alumno'
         $val = $CurrentForm->hasValue("nombre_alumno") ? $CurrentForm->getValue("nombre_alumno") : $CurrentForm->getValue("x_nombre_alumno");
         if (!$this->nombre_alumno->IsDetailKey) {
@@ -692,6 +705,16 @@ class AlumnotblEdit extends Alumnotbl
                 $this->apellidos_alumno->Visible = false; // Disable update for API request
             } else {
                 $this->apellidos_alumno->setFormValue($val);
+            }
+        }
+
+        // Check field name 'numcarnet_alumno' first before field var 'x_numcarnet_alumno'
+        $val = $CurrentForm->hasValue("numcarnet_alumno") ? $CurrentForm->getValue("numcarnet_alumno") : $CurrentForm->getValue("x_numcarnet_alumno");
+        if (!$this->numcarnet_alumno->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->numcarnet_alumno->Visible = false; // Disable update for API request
+            } else {
+                $this->numcarnet_alumno->setFormValue($val);
             }
         }
 
@@ -736,14 +759,10 @@ class AlumnotblEdit extends Alumnotbl
             }
         }
 
-        // Check field name 'numcarnet_alumno' first before field var 'x_numcarnet_alumno'
-        $val = $CurrentForm->hasValue("numcarnet_alumno") ? $CurrentForm->getValue("numcarnet_alumno") : $CurrentForm->getValue("x_numcarnet_alumno");
-        if (!$this->numcarnet_alumno->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->numcarnet_alumno->Visible = false; // Disable update for API request
-            } else {
-                $this->numcarnet_alumno->setFormValue($val);
-            }
+        // Check field name 'id_alumno' first before field var 'x_id_alumno'
+        $val = $CurrentForm->hasValue("id_alumno") ? $CurrentForm->getValue("id_alumno") : $CurrentForm->getValue("x_id_alumno");
+        if (!$this->id_alumno->IsDetailKey) {
+            $this->id_alumno->setFormValue($val);
         }
     }
 
@@ -754,12 +773,12 @@ class AlumnotblEdit extends Alumnotbl
         $this->id_alumno->CurrentValue = $this->id_alumno->FormValue;
         $this->nombre_alumno->CurrentValue = $this->nombre_alumno->FormValue;
         $this->apellidos_alumno->CurrentValue = $this->apellidos_alumno->FormValue;
+        $this->numcarnet_alumno->CurrentValue = $this->numcarnet_alumno->FormValue;
         $this->genero_alumno->CurrentValue = $this->genero_alumno->FormValue;
         $this->fechanac_alumno->CurrentValue = $this->fechanac_alumno->FormValue;
         $this->fechanac_alumno->CurrentValue = UnFormatDateTime($this->fechanac_alumno->CurrentValue, $this->fechanac_alumno->formatPattern());
         $this->direccion_alumno->CurrentValue = $this->direccion_alumno->FormValue;
         $this->telefono_alumno->CurrentValue = $this->telefono_alumno->FormValue;
-        $this->numcarnet_alumno->CurrentValue = $this->numcarnet_alumno->FormValue;
     }
 
     /**
@@ -812,11 +831,11 @@ class AlumnotblEdit extends Alumnotbl
         $this->id_alumno->setDbValue($row['id_alumno']);
         $this->nombre_alumno->setDbValue($row['nombre_alumno']);
         $this->apellidos_alumno->setDbValue($row['apellidos_alumno']);
+        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
         $this->genero_alumno->setDbValue($row['genero_alumno']);
         $this->fechanac_alumno->setDbValue($row['fechanac_alumno']);
         $this->direccion_alumno->setDbValue($row['direccion_alumno']);
         $this->telefono_alumno->setDbValue($row['telefono_alumno']);
-        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
     }
 
     // Return a row with default values
@@ -826,11 +845,11 @@ class AlumnotblEdit extends Alumnotbl
         $row['id_alumno'] = $this->id_alumno->DefaultValue;
         $row['nombre_alumno'] = $this->nombre_alumno->DefaultValue;
         $row['apellidos_alumno'] = $this->apellidos_alumno->DefaultValue;
+        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
         $row['genero_alumno'] = $this->genero_alumno->DefaultValue;
         $row['fechanac_alumno'] = $this->fechanac_alumno->DefaultValue;
         $row['direccion_alumno'] = $this->direccion_alumno->DefaultValue;
         $row['telefono_alumno'] = $this->telefono_alumno->DefaultValue;
-        $row['numcarnet_alumno'] = $this->numcarnet_alumno->DefaultValue;
         return $row;
     }
 
@@ -874,6 +893,9 @@ class AlumnotblEdit extends Alumnotbl
         // apellidos_alumno
         $this->apellidos_alumno->RowCssClass = "row";
 
+        // numcarnet_alumno
+        $this->numcarnet_alumno->RowCssClass = "row";
+
         // genero_alumno
         $this->genero_alumno->RowCssClass = "row";
 
@@ -886,25 +908,22 @@ class AlumnotblEdit extends Alumnotbl
         // telefono_alumno
         $this->telefono_alumno->RowCssClass = "row";
 
-        // numcarnet_alumno
-        $this->numcarnet_alumno->RowCssClass = "row";
-
         // View row
         if ($this->RowType == ROWTYPE_VIEW) {
-            // id_alumno
-            $this->id_alumno->ViewValue = $this->id_alumno->CurrentValue;
-
             // nombre_alumno
             $this->nombre_alumno->ViewValue = $this->nombre_alumno->CurrentValue;
 
             // apellidos_alumno
             $this->apellidos_alumno->ViewValue = $this->apellidos_alumno->CurrentValue;
 
+            // numcarnet_alumno
+            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
+
             // genero_alumno
             if (ConvertToBool($this->genero_alumno->CurrentValue)) {
-                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Yes";
+                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Masculino";
             } else {
-                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "No";
+                $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "Femenino";
             }
 
             // fechanac_alumno
@@ -917,17 +936,14 @@ class AlumnotblEdit extends Alumnotbl
             // telefono_alumno
             $this->telefono_alumno->ViewValue = $this->telefono_alumno->CurrentValue;
 
-            // numcarnet_alumno
-            $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
-
-            // id_alumno
-            $this->id_alumno->HrefValue = "";
-
             // nombre_alumno
             $this->nombre_alumno->HrefValue = "";
 
             // apellidos_alumno
             $this->apellidos_alumno->HrefValue = "";
+
+            // numcarnet_alumno
+            $this->numcarnet_alumno->HrefValue = "";
 
             // genero_alumno
             $this->genero_alumno->HrefValue = "";
@@ -940,14 +956,7 @@ class AlumnotblEdit extends Alumnotbl
 
             // telefono_alumno
             $this->telefono_alumno->HrefValue = "";
-
-            // numcarnet_alumno
-            $this->numcarnet_alumno->HrefValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
-            // id_alumno
-            $this->id_alumno->setupEditAttributes();
-            $this->id_alumno->EditValue = $this->id_alumno->CurrentValue;
-
             // nombre_alumno
             $this->nombre_alumno->setupEditAttributes();
             if (!$this->nombre_alumno->Raw) {
@@ -963,6 +972,14 @@ class AlumnotblEdit extends Alumnotbl
             }
             $this->apellidos_alumno->EditValue = HtmlEncode($this->apellidos_alumno->CurrentValue);
             $this->apellidos_alumno->PlaceHolder = RemoveHtml($this->apellidos_alumno->caption());
+
+            // numcarnet_alumno
+            $this->numcarnet_alumno->setupEditAttributes();
+            if (!$this->numcarnet_alumno->Raw) {
+                $this->numcarnet_alumno->CurrentValue = HtmlDecode($this->numcarnet_alumno->CurrentValue);
+            }
+            $this->numcarnet_alumno->EditValue = HtmlEncode($this->numcarnet_alumno->CurrentValue);
+            $this->numcarnet_alumno->PlaceHolder = RemoveHtml($this->numcarnet_alumno->caption());
 
             // genero_alumno
             $this->genero_alumno->EditValue = $this->genero_alumno->options(false);
@@ -989,24 +1006,16 @@ class AlumnotblEdit extends Alumnotbl
             $this->telefono_alumno->EditValue = HtmlEncode($this->telefono_alumno->CurrentValue);
             $this->telefono_alumno->PlaceHolder = RemoveHtml($this->telefono_alumno->caption());
 
-            // numcarnet_alumno
-            $this->numcarnet_alumno->setupEditAttributes();
-            if (!$this->numcarnet_alumno->Raw) {
-                $this->numcarnet_alumno->CurrentValue = HtmlDecode($this->numcarnet_alumno->CurrentValue);
-            }
-            $this->numcarnet_alumno->EditValue = HtmlEncode($this->numcarnet_alumno->CurrentValue);
-            $this->numcarnet_alumno->PlaceHolder = RemoveHtml($this->numcarnet_alumno->caption());
-
             // Edit refer script
-
-            // id_alumno
-            $this->id_alumno->HrefValue = "";
 
             // nombre_alumno
             $this->nombre_alumno->HrefValue = "";
 
             // apellidos_alumno
             $this->apellidos_alumno->HrefValue = "";
+
+            // numcarnet_alumno
+            $this->numcarnet_alumno->HrefValue = "";
 
             // genero_alumno
             $this->genero_alumno->HrefValue = "";
@@ -1019,9 +1028,6 @@ class AlumnotblEdit extends Alumnotbl
 
             // telefono_alumno
             $this->telefono_alumno->HrefValue = "";
-
-            // numcarnet_alumno
-            $this->numcarnet_alumno->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1043,11 +1049,6 @@ class AlumnotblEdit extends Alumnotbl
             return true;
         }
         $validateForm = true;
-        if ($this->id_alumno->Required) {
-            if (!$this->id_alumno->IsDetailKey && EmptyValue($this->id_alumno->FormValue)) {
-                $this->id_alumno->addErrorMessage(str_replace("%s", $this->id_alumno->caption(), $this->id_alumno->RequiredErrorMessage));
-            }
-        }
         if ($this->nombre_alumno->Required) {
             if (!$this->nombre_alumno->IsDetailKey && EmptyValue($this->nombre_alumno->FormValue)) {
                 $this->nombre_alumno->addErrorMessage(str_replace("%s", $this->nombre_alumno->caption(), $this->nombre_alumno->RequiredErrorMessage));
@@ -1056,6 +1057,11 @@ class AlumnotblEdit extends Alumnotbl
         if ($this->apellidos_alumno->Required) {
             if (!$this->apellidos_alumno->IsDetailKey && EmptyValue($this->apellidos_alumno->FormValue)) {
                 $this->apellidos_alumno->addErrorMessage(str_replace("%s", $this->apellidos_alumno->caption(), $this->apellidos_alumno->RequiredErrorMessage));
+            }
+        }
+        if ($this->numcarnet_alumno->Required) {
+            if (!$this->numcarnet_alumno->IsDetailKey && EmptyValue($this->numcarnet_alumno->FormValue)) {
+                $this->numcarnet_alumno->addErrorMessage(str_replace("%s", $this->numcarnet_alumno->caption(), $this->numcarnet_alumno->RequiredErrorMessage));
             }
         }
         if ($this->genero_alumno->Required) {
@@ -1081,10 +1087,12 @@ class AlumnotblEdit extends Alumnotbl
                 $this->telefono_alumno->addErrorMessage(str_replace("%s", $this->telefono_alumno->caption(), $this->telefono_alumno->RequiredErrorMessage));
             }
         }
-        if ($this->numcarnet_alumno->Required) {
-            if (!$this->numcarnet_alumno->IsDetailKey && EmptyValue($this->numcarnet_alumno->FormValue)) {
-                $this->numcarnet_alumno->addErrorMessage(str_replace("%s", $this->numcarnet_alumno->caption(), $this->numcarnet_alumno->RequiredErrorMessage));
-            }
+
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("CalificacionTblGrid");
+        if (in_array("calificacion_tbl", $detailTblVar) && $detailPage->DetailEdit) {
+            $validateForm = $validateForm && $detailPage->validateGridForm();
         }
 
         // Return validate result
@@ -1128,12 +1136,11 @@ class AlumnotblEdit extends Alumnotbl
         // apellidos_alumno
         $this->apellidos_alumno->setDbValueDef($rsnew, $this->apellidos_alumno->CurrentValue, "", $this->apellidos_alumno->ReadOnly);
 
+        // numcarnet_alumno
+        $this->numcarnet_alumno->setDbValueDef($rsnew, $this->numcarnet_alumno->CurrentValue, "", $this->numcarnet_alumno->ReadOnly);
+
         // genero_alumno
-        $tmpBool = $this->genero_alumno->CurrentValue;
-        if ($tmpBool != "1" && $tmpBool != "0") {
-            $tmpBool = !empty($tmpBool) ? "1" : "0";
-        }
-        $this->genero_alumno->setDbValueDef($rsnew, $tmpBool, null, $this->genero_alumno->ReadOnly);
+        $this->genero_alumno->setDbValueDef($rsnew, strval($this->genero_alumno->CurrentValue) == "1" ? "1" : "0", null, $this->genero_alumno->ReadOnly);
 
         // fechanac_alumno
         $this->fechanac_alumno->setDbValueDef($rsnew, UnFormatDateTime($this->fechanac_alumno->CurrentValue, $this->fechanac_alumno->formatPattern()), null, $this->fechanac_alumno->ReadOnly);
@@ -1144,11 +1151,13 @@ class AlumnotblEdit extends Alumnotbl
         // telefono_alumno
         $this->telefono_alumno->setDbValueDef($rsnew, $this->telefono_alumno->CurrentValue, null, $this->telefono_alumno->ReadOnly);
 
-        // numcarnet_alumno
-        $this->numcarnet_alumno->setDbValueDef($rsnew, $this->numcarnet_alumno->CurrentValue, "", $this->numcarnet_alumno->ReadOnly);
-
         // Update current values
         $this->setCurrentValues($rsnew);
+
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
 
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -1163,6 +1172,30 @@ class AlumnotblEdit extends Alumnotbl
                 $editRow = true; // No field to update
             }
             if ($editRow) {
+            }
+
+            // Update detail records
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            if ($editRow) {
+                $detailPage = Container("CalificacionTblGrid");
+                if (in_array("calificacion_tbl", $detailTblVar) && $detailPage->DetailEdit) {
+                    $Security->loadCurrentUserLevel($this->ProjectID . "calificacion_tbl"); // Load user level of detail table
+                    $editRow = $detailPage->gridUpdate();
+                    $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                }
+            }
+
+            // Commit/Rollback transaction
+            if ($this->getCurrentDetailTable() != "") {
+                if ($editRow) {
+                    if ($this->UseTransaction) { // Commit transaction
+                        $conn->commit();
+                    }
+                } else {
+                    if ($this->UseTransaction) { // Rollback transaction
+                        $conn->rollback();
+                    }
+                }
             }
         } else {
             if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
@@ -1188,6 +1221,37 @@ class AlumnotblEdit extends Alumnotbl
             WriteJson(["success" => true, "action" => Config("API_EDIT_ACTION"), $table => $row]);
         }
         return $editRow;
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("calificacion_tbl", $detailTblVar)) {
+                $detailPageObj = Container("CalificacionTblGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->fk_id_alumno->IsDetailKey = true;
+                    $detailPageObj->fk_id_alumno->CurrentValue = $this->id_alumno->CurrentValue;
+                    $detailPageObj->fk_id_alumno->setSessionValue($detailPageObj->fk_id_alumno->CurrentValue);
+                    $detailPageObj->fk_id_asignatura->setSessionValue(""); // Clear session key
+                }
+            }
+        }
     }
 
     // Set up Breadcrumb

@@ -44,11 +44,11 @@ class Alumnotbl extends DbTable
     public $id_alumno;
     public $nombre_alumno;
     public $apellidos_alumno;
+    public $numcarnet_alumno;
     public $genero_alumno;
     public $fechanac_alumno;
     public $direccion_alumno;
     public $telefono_alumno;
-    public $numcarnet_alumno;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -89,7 +89,7 @@ class Alumnotbl extends DbTable
         $this->DetailEdit = false; // Allow detail edit
         $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
-        $this->GridAddRowCount = 5;
+        $this->GridAddRowCount = 3;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
         $this->UseAjaxActions = $this->UseAjaxActions || Config("USE_AJAX_ACTIONS");
         $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
@@ -116,6 +116,8 @@ class Alumnotbl extends DbTable
         $this->id_alumno->InputTextType = "text";
         $this->id_alumno->IsAutoIncrement = true; // Autoincrement field
         $this->id_alumno->IsPrimaryKey = true; // Primary key field
+        $this->id_alumno->IsForeignKey = true; // Foreign key field
+        $this->id_alumno->Sortable = false; // Allow sort
         $this->id_alumno->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id_alumno->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['id_alumno'] = &$this->id_alumno;
@@ -168,6 +170,30 @@ class Alumnotbl extends DbTable
         $this->apellidos_alumno->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['apellidos_alumno'] = &$this->apellidos_alumno;
 
+        // numcarnet_alumno
+        $this->numcarnet_alumno = new DbField(
+            $this, // Table
+            'x_numcarnet_alumno', // Variable name
+            'numcarnet_alumno', // Name
+            '`numcarnet_alumno`', // Expression
+            '`numcarnet_alumno`', // Basic search expression
+            200, // Type
+            10, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`numcarnet_alumno`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->numcarnet_alumno->InputTextType = "text";
+        $this->numcarnet_alumno->Nullable = false; // NOT NULL field
+        $this->numcarnet_alumno->Required = true; // Required field
+        $this->numcarnet_alumno->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['numcarnet_alumno'] = &$this->numcarnet_alumno;
+
         // genero_alumno
         $this->genero_alumno = new DbField(
             $this, // Table
@@ -184,7 +210,7 @@ class Alumnotbl extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'CHECKBOX' // Edit Tag
+            'RADIO' // Edit Tag
         );
         $this->genero_alumno->InputTextType = "text";
         $this->genero_alumno->DataType = DATATYPE_BOOLEAN;
@@ -207,10 +233,10 @@ class Alumnotbl extends DbTable
             'x_fechanac_alumno', // Variable name
             'fechanac_alumno', // Name
             '`fechanac_alumno`', // Expression
-            CastDateFieldForLike("`fechanac_alumno`", 0, "DB"), // Basic search expression
+            CastDateFieldForLike("`fechanac_alumno`", 14, "DB"), // Basic search expression
             133, // Type
             10, // Size
-            0, // Date/Time format
+            14, // Date/Time format
             false, // Is upload field
             '`fechanac_alumno`', // Virtual expression
             false, // Is virtual
@@ -220,7 +246,7 @@ class Alumnotbl extends DbTable
             'TEXT' // Edit Tag
         );
         $this->fechanac_alumno->InputTextType = "text";
-        $this->fechanac_alumno->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->fechanac_alumno->DefaultErrorMessage = str_replace("%s", DateFormat(14), $Language->phrase("IncorrectDate"));
         $this->fechanac_alumno->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['fechanac_alumno'] = &$this->fechanac_alumno;
 
@@ -267,30 +293,6 @@ class Alumnotbl extends DbTable
         $this->telefono_alumno->InputTextType = "text";
         $this->telefono_alumno->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['telefono_alumno'] = &$this->telefono_alumno;
-
-        // numcarnet_alumno
-        $this->numcarnet_alumno = new DbField(
-            $this, // Table
-            'x_numcarnet_alumno', // Variable name
-            'numcarnet_alumno', // Name
-            '`numcarnet_alumno`', // Expression
-            '`numcarnet_alumno`', // Basic search expression
-            200, // Type
-            10, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`numcarnet_alumno`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->numcarnet_alumno->InputTextType = "text";
-        $this->numcarnet_alumno->Nullable = false; // NOT NULL field
-        $this->numcarnet_alumno->Required = true; // Required field
-        $this->numcarnet_alumno->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['numcarnet_alumno'] = &$this->numcarnet_alumno;
 
         // Add Doctrine Cache
         $this->Cache = new ArrayCache();
@@ -348,6 +350,32 @@ class Alumnotbl extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "calificacion_tbl") {
+            $detailUrl = Container("calificacion_tbl")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id_alumno", $this->id_alumno->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "AlumnotblList";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -696,6 +724,33 @@ class Alumnotbl extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
+        // Cascade Update detail table 'calificacion_tbl'
+        $cascadeUpdate = false;
+        $rscascade = [];
+        if ($rsold && (isset($rs['id_alumno']) && $rsold['id_alumno'] != $rs['id_alumno'])) { // Update detail field 'fk_id_alumno'
+            $cascadeUpdate = true;
+            $rscascade['fk_id_alumno'] = $rs['id_alumno'];
+        }
+        if ($cascadeUpdate) {
+            $rswrk = Container("calificacion_tbl")->loadRs("`fk_id_alumno` = " . QuotedValue($rsold['id_alumno'], DATATYPE_NUMBER, 'DB'))->fetchAllAssociative();
+            foreach ($rswrk as $rsdtlold) {
+                $rskey = [];
+                $fldname = 'id_calificacion';
+                $rskey[$fldname] = $rsdtlold[$fldname];
+                $rsdtlnew = array_merge($rsdtlold, $rscascade);
+                // Call Row_Updating event
+                $success = Container("calificacion_tbl")->rowUpdating($rsdtlold, $rsdtlnew);
+                if ($success) {
+                    $success = Container("calificacion_tbl")->update($rscascade, $rskey, $rsdtlold);
+                }
+                if (!$success) {
+                    return false;
+                }
+                // Call Row_Updated event
+                Container("calificacion_tbl")->rowUpdated($rsdtlold, $rsdtlnew);
+            }
+        }
+
         // If no field is updated, execute may return 0. Treat as success
         try {
             $success = $this->updateSql($rs, $where, $curfilter)->execute();
@@ -744,6 +799,30 @@ class Alumnotbl extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
+
+        // Cascade delete detail table 'calificacion_tbl'
+        $dtlrows = Container("calificacion_tbl")->loadRs("`fk_id_alumno` = " . QuotedValue($rs['id_alumno'], DATATYPE_NUMBER, "DB"))->fetchAllAssociative();
+        // Call Row Deleting event
+        foreach ($dtlrows as $dtlrow) {
+            $success = Container("calificacion_tbl")->rowDeleting($dtlrow);
+            if (!$success) {
+                break;
+            }
+        }
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                $success = Container("calificacion_tbl")->delete($dtlrow); // Delete
+                if (!$success) {
+                    break;
+                }
+            }
+        }
+        // Call Row Deleted event
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                Container("calificacion_tbl")->rowDeleted($dtlrow);
+            }
+        }
         if ($success) {
             try {
                 $success = $this->deleteSql($rs, $where, $curfilter)->execute();
@@ -765,11 +844,11 @@ class Alumnotbl extends DbTable
         $this->id_alumno->DbValue = $row['id_alumno'];
         $this->nombre_alumno->DbValue = $row['nombre_alumno'];
         $this->apellidos_alumno->DbValue = $row['apellidos_alumno'];
+        $this->numcarnet_alumno->DbValue = $row['numcarnet_alumno'];
         $this->genero_alumno->DbValue = $row['genero_alumno'];
         $this->fechanac_alumno->DbValue = $row['fechanac_alumno'];
         $this->direccion_alumno->DbValue = $row['direccion_alumno'];
         $this->telefono_alumno->DbValue = $row['telefono_alumno'];
-        $this->numcarnet_alumno->DbValue = $row['numcarnet_alumno'];
     }
 
     // Delete uploaded files
@@ -926,7 +1005,11 @@ class Alumnotbl extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("AlumnotblEdit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("AlumnotblEdit", $parm);
+        } else {
+            $url = $this->keyUrl("AlumnotblEdit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -940,7 +1023,11 @@ class Alumnotbl extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("AlumnotblAdd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("AlumnotblAdd", $parm);
+        } else {
+            $url = $this->keyUrl("AlumnotblAdd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1009,7 +1096,7 @@ class Alumnotbl extends DbTable
         if ($sortUrl) {
             $html .= '<div class="ew-table-header-sort">' . $fld->getSortIcon() . '</div>';
         }
-        if ($fld->UseFilter) {
+        if ($fld->UseFilter && $Security->canSearch()) {
             $html .= '<div class="ew-filter-dropdown-btn" data-ew-action="filter" data-table="' . $fld->TableVar . '" data-field="' . $fld->FieldVar .
                 '"><div class="ew-table-header-filter" role="button" aria-haspopup="true">' . $Language->phrase("Filter") . '</div></div>';
         }
@@ -1126,11 +1213,11 @@ class Alumnotbl extends DbTable
         $this->id_alumno->setDbValue($row['id_alumno']);
         $this->nombre_alumno->setDbValue($row['nombre_alumno']);
         $this->apellidos_alumno->setDbValue($row['apellidos_alumno']);
+        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
         $this->genero_alumno->setDbValue($row['genero_alumno']);
         $this->fechanac_alumno->setDbValue($row['fechanac_alumno']);
         $this->direccion_alumno->setDbValue($row['direccion_alumno']);
         $this->telefono_alumno->setDbValue($row['telefono_alumno']);
-        $this->numcarnet_alumno->setDbValue($row['numcarnet_alumno']);
     }
 
     // Render list content
@@ -1167,6 +1254,8 @@ class Alumnotbl extends DbTable
 
         // apellidos_alumno
 
+        // numcarnet_alumno
+
         // genero_alumno
 
         // fechanac_alumno
@@ -1174,8 +1263,6 @@ class Alumnotbl extends DbTable
         // direccion_alumno
 
         // telefono_alumno
-
-        // numcarnet_alumno
 
         // id_alumno
         $this->id_alumno->ViewValue = $this->id_alumno->CurrentValue;
@@ -1186,11 +1273,14 @@ class Alumnotbl extends DbTable
         // apellidos_alumno
         $this->apellidos_alumno->ViewValue = $this->apellidos_alumno->CurrentValue;
 
+        // numcarnet_alumno
+        $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
+
         // genero_alumno
         if (ConvertToBool($this->genero_alumno->CurrentValue)) {
-            $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Yes";
+            $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(1) != "" ? $this->genero_alumno->tagCaption(1) : "Masculino";
         } else {
-            $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "No";
+            $this->genero_alumno->ViewValue = $this->genero_alumno->tagCaption(2) != "" ? $this->genero_alumno->tagCaption(2) : "Femenino";
         }
 
         // fechanac_alumno
@@ -1203,9 +1293,6 @@ class Alumnotbl extends DbTable
         // telefono_alumno
         $this->telefono_alumno->ViewValue = $this->telefono_alumno->CurrentValue;
 
-        // numcarnet_alumno
-        $this->numcarnet_alumno->ViewValue = $this->numcarnet_alumno->CurrentValue;
-
         // id_alumno
         $this->id_alumno->HrefValue = "";
         $this->id_alumno->TooltipValue = "";
@@ -1217,6 +1304,10 @@ class Alumnotbl extends DbTable
         // apellidos_alumno
         $this->apellidos_alumno->HrefValue = "";
         $this->apellidos_alumno->TooltipValue = "";
+
+        // numcarnet_alumno
+        $this->numcarnet_alumno->HrefValue = "";
+        $this->numcarnet_alumno->TooltipValue = "";
 
         // genero_alumno
         $this->genero_alumno->HrefValue = "";
@@ -1233,10 +1324,6 @@ class Alumnotbl extends DbTable
         // telefono_alumno
         $this->telefono_alumno->HrefValue = "";
         $this->telefono_alumno->TooltipValue = "";
-
-        // numcarnet_alumno
-        $this->numcarnet_alumno->HrefValue = "";
-        $this->numcarnet_alumno->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1273,6 +1360,14 @@ class Alumnotbl extends DbTable
         $this->apellidos_alumno->EditValue = $this->apellidos_alumno->CurrentValue;
         $this->apellidos_alumno->PlaceHolder = RemoveHtml($this->apellidos_alumno->caption());
 
+        // numcarnet_alumno
+        $this->numcarnet_alumno->setupEditAttributes();
+        if (!$this->numcarnet_alumno->Raw) {
+            $this->numcarnet_alumno->CurrentValue = HtmlDecode($this->numcarnet_alumno->CurrentValue);
+        }
+        $this->numcarnet_alumno->EditValue = $this->numcarnet_alumno->CurrentValue;
+        $this->numcarnet_alumno->PlaceHolder = RemoveHtml($this->numcarnet_alumno->caption());
+
         // genero_alumno
         $this->genero_alumno->EditValue = $this->genero_alumno->options(false);
         $this->genero_alumno->PlaceHolder = RemoveHtml($this->genero_alumno->caption());
@@ -1297,14 +1392,6 @@ class Alumnotbl extends DbTable
         }
         $this->telefono_alumno->EditValue = $this->telefono_alumno->CurrentValue;
         $this->telefono_alumno->PlaceHolder = RemoveHtml($this->telefono_alumno->caption());
-
-        // numcarnet_alumno
-        $this->numcarnet_alumno->setupEditAttributes();
-        if (!$this->numcarnet_alumno->Raw) {
-            $this->numcarnet_alumno->CurrentValue = HtmlDecode($this->numcarnet_alumno->CurrentValue);
-        }
-        $this->numcarnet_alumno->EditValue = $this->numcarnet_alumno->CurrentValue;
-        $this->numcarnet_alumno->PlaceHolder = RemoveHtml($this->numcarnet_alumno->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1334,23 +1421,21 @@ class Alumnotbl extends DbTable
             if ($doc->Horizontal) { // Horizontal format, write header
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
-                    $doc->exportCaption($this->id_alumno);
                     $doc->exportCaption($this->nombre_alumno);
                     $doc->exportCaption($this->apellidos_alumno);
+                    $doc->exportCaption($this->numcarnet_alumno);
                     $doc->exportCaption($this->genero_alumno);
                     $doc->exportCaption($this->fechanac_alumno);
                     $doc->exportCaption($this->direccion_alumno);
                     $doc->exportCaption($this->telefono_alumno);
-                    $doc->exportCaption($this->numcarnet_alumno);
                 } else {
-                    $doc->exportCaption($this->id_alumno);
                     $doc->exportCaption($this->nombre_alumno);
                     $doc->exportCaption($this->apellidos_alumno);
+                    $doc->exportCaption($this->numcarnet_alumno);
                     $doc->exportCaption($this->genero_alumno);
                     $doc->exportCaption($this->fechanac_alumno);
                     $doc->exportCaption($this->direccion_alumno);
                     $doc->exportCaption($this->telefono_alumno);
-                    $doc->exportCaption($this->numcarnet_alumno);
                 }
                 $doc->endExportRow();
             }
@@ -1380,23 +1465,21 @@ class Alumnotbl extends DbTable
                 if (!$doc->ExportCustom) {
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
-                        $doc->exportField($this->id_alumno);
                         $doc->exportField($this->nombre_alumno);
                         $doc->exportField($this->apellidos_alumno);
+                        $doc->exportField($this->numcarnet_alumno);
                         $doc->exportField($this->genero_alumno);
                         $doc->exportField($this->fechanac_alumno);
                         $doc->exportField($this->direccion_alumno);
                         $doc->exportField($this->telefono_alumno);
-                        $doc->exportField($this->numcarnet_alumno);
                     } else {
-                        $doc->exportField($this->id_alumno);
                         $doc->exportField($this->nombre_alumno);
                         $doc->exportField($this->apellidos_alumno);
+                        $doc->exportField($this->numcarnet_alumno);
                         $doc->exportField($this->genero_alumno);
                         $doc->exportField($this->fechanac_alumno);
                         $doc->exportField($this->direccion_alumno);
                         $doc->exportField($this->telefono_alumno);
-                        $doc->exportField($this->numcarnet_alumno);
                     }
                     $doc->endExportRow($rowCnt);
                 }

@@ -36,4 +36,16 @@ return [
 
     // Tables
     "alumnotbl" => \DI\create(Alumnotbl::class),
+    "asignatura_tbl" => \DI\create(AsignaturaTbl::class),
+    "calificacion_tbl" => \DI\create(CalificacionTbl::class),
+    "profesor_tbl" => \DI\create(ProfesorTbl::class),
+    "usuarios_tbl" => \DI\create(UsuariosTbl::class),
+    "userlevelpermissions" => \DI\create(Userlevelpermissions::class),
+    "userlevels" => \DI\create(Userlevels::class),
+    "alumnos_asignatura_tbl" => \DI\create(AlumnosAsignaturaTbl::class),
+    "alumnosporasigntura_vw" => \DI\create(AlumnosporasignturaVw::class),
+    "evaluacion_tbl" => \DI\create(EvaluacionTbl::class),
+
+    // User table
+    "usertable" => \DI\get("usuarios_tbl"),
 ];
