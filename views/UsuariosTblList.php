@@ -162,9 +162,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->email_usuario->Visible) { // email_usuario ?>
         <th data-name="email_usuario" class="<?= $Page->email_usuario->headerCellClass() ?>"><div id="elh_usuarios_tbl_email_usuario" class="usuarios_tbl_email_usuario"><?= $Page->renderFieldHeader($Page->email_usuario) ?></div></th>
 <?php } ?>
-<?php if ($Page->parent_id_usuario->Visible) { // parent_id_usuario ?>
-        <th data-name="parent_id_usuario" class="<?= $Page->parent_id_usuario->headerCellClass() ?>"><div id="elh_usuarios_tbl_parent_id_usuario" class="usuarios_tbl_parent_id_usuario"><?= $Page->renderFieldHeader($Page->parent_id_usuario) ?></div></th>
-<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -229,14 +226,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_usuarios_tbl_email_usuario" class="el_usuarios_tbl_email_usuario">
 <span<?= $Page->email_usuario->viewAttributes() ?>>
 <?= $Page->email_usuario->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->parent_id_usuario->Visible) { // parent_id_usuario ?>
-        <td data-name="parent_id_usuario"<?= $Page->parent_id_usuario->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_usuarios_tbl_parent_id_usuario" class="el_usuarios_tbl_parent_id_usuario">
-<span<?= $Page->parent_id_usuario->viewAttributes() ?>>
-<?= $Page->parent_id_usuario->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

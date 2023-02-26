@@ -368,7 +368,7 @@ class UsuariosTblDelete extends UsuariosTbl
         $this->login_usuario->setVisibility();
         $this->password_usuario->setVisibility();
         $this->email_usuario->setVisibility();
-        $this->parent_id_usuario->setVisibility();
+        $this->parent_id_usuario->Visible = false;
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -713,10 +713,6 @@ class UsuariosTblDelete extends UsuariosTbl
             // email_usuario
             $this->email_usuario->HrefValue = "";
             $this->email_usuario->TooltipValue = "";
-
-            // parent_id_usuario
-            $this->parent_id_usuario->HrefValue = "";
-            $this->parent_id_usuario->TooltipValue = "";
         }
 
         // Call Row Rendered event

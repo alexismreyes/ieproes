@@ -647,7 +647,7 @@ class UsuariosTblList extends UsuariosTbl
         $this->login_usuario->setVisibility();
         $this->password_usuario->setVisibility();
         $this->email_usuario->setVisibility();
-        $this->parent_id_usuario->setVisibility();
+        $this->parent_id_usuario->Visible = false;
 
         // Set lookup cache
         if (!in_array($this->PageID, Config("LOOKUP_CACHE_PAGE_IDS"))) {
@@ -1241,7 +1241,6 @@ class UsuariosTblList extends UsuariosTbl
             $this->updateSort($this->login_usuario); // login_usuario
             $this->updateSort($this->password_usuario); // password_usuario
             $this->updateSort($this->email_usuario); // email_usuario
-            $this->updateSort($this->parent_id_usuario); // parent_id_usuario
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1472,7 +1471,6 @@ class UsuariosTblList extends UsuariosTbl
             $option->add("login_usuario", $this->createColumnOption("login_usuario"));
             $option->add("password_usuario", $this->createColumnOption("password_usuario"));
             $option->add("email_usuario", $this->createColumnOption("email_usuario"));
-            $option->add("parent_id_usuario", $this->createColumnOption("parent_id_usuario"));
         }
 
         // Set up options default
@@ -2017,10 +2015,6 @@ class UsuariosTblList extends UsuariosTbl
             // email_usuario
             $this->email_usuario->HrefValue = "";
             $this->email_usuario->TooltipValue = "";
-
-            // parent_id_usuario
-            $this->parent_id_usuario->HrefValue = "";
-            $this->parent_id_usuario->TooltipValue = "";
         }
 
         // Call Row Rendered event

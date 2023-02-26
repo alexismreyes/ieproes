@@ -68,9 +68,6 @@ $Page->showMessage();
 <?php if ($Page->email_usuario->Visible) { // email_usuario ?>
         <th class="<?= $Page->email_usuario->headerCellClass() ?>"><span id="elh_usuarios_tbl_email_usuario" class="usuarios_tbl_email_usuario"><?= $Page->email_usuario->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->parent_id_usuario->Visible) { // parent_id_usuario ?>
-        <th class="<?= $Page->parent_id_usuario->headerCellClass() ?>"><span id="elh_usuarios_tbl_parent_id_usuario" class="usuarios_tbl_parent_id_usuario"><?= $Page->parent_id_usuario->caption() ?></span></th>
-<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -137,14 +134,6 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_usuarios_tbl_email_usuario" class="el_usuarios_tbl_email_usuario">
 <span<?= $Page->email_usuario->viewAttributes() ?>>
 <?= $Page->email_usuario->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->parent_id_usuario->Visible) { // parent_id_usuario ?>
-        <td<?= $Page->parent_id_usuario->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_usuarios_tbl_parent_id_usuario" class="el_usuarios_tbl_parent_id_usuario">
-<span<?= $Page->parent_id_usuario->viewAttributes() ?>>
-<?= $Page->parent_id_usuario->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
