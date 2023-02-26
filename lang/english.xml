@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ew-language version="19.5.0" id="en-US" name="English (US)" desc="English (US)" author="e.World Technology Limited" date="2023/2/25">
+<ew-language version="19.5.0" id="en-US" name="English (US)" desc="English (US)" author="e.World Technology Limited" date="2023/2/26">
   <!--
     IMPORTANT NOTES:
     1. Language ID must be RFC 4646 language tags (which use hyphen, not underscore), e.g. en-US, fr-CA, fr-FR,
@@ -1157,7 +1157,8 @@
     </fullcalendar>
   </global>
   <project>
-    <phrase id="footertext" value="&amp;copy;2022 e.World Technology Limited. All rights reserved." />
+    <phrase id="bodytitle" value="Registro de calificaciones" />
+    <phrase id="footertext" value="IEPROES - San Salvador" />
     <menu id="11">
       <phrase id="menutext" value="asignaturas vw" />
     </menu>
@@ -1178,6 +1179,21 @@
     </menu>
     <menu id="4">
       <phrase id="menutext" value="profesor tbl" />
+    </menu>
+    <menu id="26">
+      <phrase id="menutext" value="Reportes" />
+    </menu>
+    <menu id="12">
+      <phrase id="menutext" value="Calificaciones x alumno" />
+    </menu>
+    <menu id="13">
+      <phrase id="menutext" value="Calificaciones por alumno" />
+    </menu>
+    <menu id="14">
+      <phrase id="menutext" value="promedioxasignatura vw" />
+    </menu>
+    <menu id="15">
+      <phrase id="menutext" value="Promedios por asignatura" />
     </menu>
     <menu id="5">
       <phrase id="menutext" value="Usuarios" />
@@ -1370,6 +1386,82 @@
       </field>
       <field id="nombre_asignatura">
         <phrase id="fldcaption" value="nombre asignatura" />
+      </field>
+      <field id="id_profesor">
+        <phrase id="fldcaption" value="id profesor" />
+      </field>
+    </table>
+    <table id="calificacionesxalumno_vw">
+      <phrase id="tblcaption" value="Calificaciones x alumno" />
+      <field id="concatalmnombre_alumnoalmapellidos_alumno">
+        <phrase id="fldcaption" value="Alumno" />
+      </field>
+      <field id="nombre_asignatura">
+        <phrase id="fldcaption" value="Asignatura" />
+      </field>
+      <field id="nombre_evaluacion">
+        <phrase id="fldcaption" value="Evaluacion" />
+      </field>
+      <field id="nota_calificacion">
+        <phrase id="fldcaption" value="Calificacion" />
+      </field>
+      <field id="id_profesor">
+        <phrase id="fldcaption" value="id profesor" />
+      </field>
+    </table>
+    <table id="calificacionesxalumno_rpt">
+      <phrase id="tblcaption" value="Calificaciones por alumno" />
+      <field id="concatalmnombre_alumnoalmapellidos_alumno">
+        <phrase id="fldcaption" value="Alumno" />
+      </field>
+      <field id="nombre_asignatura">
+        <phrase id="fldcaption" value="Asignatura" />
+      </field>
+      <field id="nombre_evaluacion">
+        <phrase id="fldcaption" value="Evaluacion" />
+      </field>
+      <field id="nota_calificacion">
+        <phrase id="fldcaption" value="Calificacion" />
+      </field>
+      <field id="id_profesor">
+        <phrase id="fldcaption" value="id profesor" />
+      </field>
+    </table>
+    <table id="promedioxasignatura_vw">
+      <phrase id="tblcaption" value="promedioxasignatura vw" />
+      <field id="concatalmnombre_alumnoalmapellidos_alumno">
+        <phrase id="fldcaption" value="Alumno" />
+      </field>
+      <field id="nombre_asignatura">
+        <phrase id="fldcaption" value="Asignatura" />
+      </field>
+      <field id="avgcalnota_calificacion">
+        <phrase id="fldcaption" value="Promedio" />
+      </field>
+      <field id="id_profesor">
+        <phrase id="fldcaption" value="id profesor" />
+      </field>
+    </table>
+    <table id="promedioxasignatura_rpt">
+      <phrase id="tblcaption" value="Promedios por asignatura" />
+      <chart id="promediopormateria_chart">
+        <phrase id="chartcaption" value="Nota promedio general por materia" />
+        <phrase id="chartxaxisname" value="Asignatura" />
+        <phrase id="chartyaxisname" value="Promedio" />
+      </chart>
+      <chart id="alumnosporasignatura_chart">
+        <phrase id="chartcaption" value="Conteo de alumnos por asignatura" />
+        <phrase id="chartxaxisname" value="Asignatura" />
+        <phrase id="chartyaxisname" value="Asignatura" />
+      </chart>
+      <field id="concatalmnombre_alumnoalmapellidos_alumno">
+        <phrase id="fldcaption" value="Alumno" />
+      </field>
+      <field id="nombre_asignatura">
+        <phrase id="fldcaption" value="Asignatura" />
+      </field>
+      <field id="avgcalnota_calificacion">
+        <phrase id="fldcaption" value="Promedio" />
       </field>
       <field id="id_profesor">
         <phrase id="fldcaption" value="id profesor" />

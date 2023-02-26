@@ -150,6 +150,32 @@ return function (App $app) {
         }
     );
 
+    // calificacionesxalumno_vw
+    $app->map(["GET","POST","OPTIONS"], '/CalificacionesxalumnoVwList', CalificacionesxalumnoVwController::class . ':list')->add(PermissionMiddleware::class)->setName('CalificacionesxalumnoVwList-calificacionesxalumno_vw-list'); // list
+    $app->group(
+        '/calificacionesxalumno_vw',
+        function (RouteCollectorProxy $group) {
+            $group->map(["GET","POST","OPTIONS"], '/' . Config('LIST_ACTION') . '', CalificacionesxalumnoVwController::class . ':list')->add(PermissionMiddleware::class)->setName('calificacionesxalumno_vw/list-calificacionesxalumno_vw-list-2'); // list
+        }
+    );
+
+    // calificacionesxalumno_rpt
+    $app->map(["GET", "POST", "OPTIONS"], '/CalificacionesxalumnoRpt', CalificacionesxalumnoRptController::class . ':summary')->add(PermissionMiddleware::class)->setName('CalificacionesxalumnoRpt-calificacionesxalumno_rpt-summary'); // summary
+
+    // promedioxasignatura_vw
+    $app->map(["GET","POST","OPTIONS"], '/PromedioxasignaturaVwList', PromedioxasignaturaVwController::class . ':list')->add(PermissionMiddleware::class)->setName('PromedioxasignaturaVwList-promedioxasignatura_vw-list'); // list
+    $app->group(
+        '/promedioxasignatura_vw',
+        function (RouteCollectorProxy $group) {
+            $group->map(["GET","POST","OPTIONS"], '/' . Config('LIST_ACTION') . '', PromedioxasignaturaVwController::class . ':list')->add(PermissionMiddleware::class)->setName('promedioxasignatura_vw/list-promedioxasignatura_vw-list-2'); // list
+        }
+    );
+
+    // promedioxasignatura_rpt
+    $app->map(["GET", "POST", "OPTIONS"], '/PromedioxasignaturaRpt/promediopormateria_chart', PromedioxasignaturaRptController::class . ':promediopormateria_chart')->add(PermissionMiddleware::class)->setName('PromedioxasignaturaRpt-promedioxasignatura_rpt-summary-promediopormateria_chart'); // promediopormateria_chart
+    $app->map(["GET", "POST", "OPTIONS"], '/PromedioxasignaturaRpt/alumnosporasignatura_chart', PromedioxasignaturaRptController::class . ':alumnosporasignatura_chart')->add(PermissionMiddleware::class)->setName('PromedioxasignaturaRpt-promedioxasignatura_rpt-summary-alumnosporasignatura_chart'); // alumnosporasignatura_chart
+    $app->map(["GET", "POST", "OPTIONS"], '/PromedioxasignaturaRpt', PromedioxasignaturaRptController::class . ':summary')->add(PermissionMiddleware::class)->setName('PromedioxasignaturaRpt-promedioxasignatura_rpt-summary'); // summary
+
     // personal_data
     $app->map(["GET","POST","OPTIONS"], '/personaldata', OthersController::class . ':personaldata')->add(PermissionMiddleware::class)->setName('personaldata');
 

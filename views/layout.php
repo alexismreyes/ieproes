@@ -77,6 +77,138 @@ ew.ready("head", [
     ew.PATH_BASE + "js/ewdatetimepicker.min.js?v=19.5.1"
 ], "datetimepicker");
 </script>
+<script>
+// Load chart *.js
+loadjs(ew.PATH_BASE + "js/chart.min.js?v=19.5.0", "chartjs");
+ew.ready(["chartjs", "luxon"], [
+    ew.PATH_BASE + "js/chartjs-adapter-luxon.min.js?v=19.5.0",
+    ew.PATH_BASE + "js/chartjs-plugin-annotation.min.js?v=19.5.0",
+    ew.PATH_BASE + "js/chartjs-plugin-datalabels.min.js?v=19.5.0"
+], "chart");
+// Create chart
+ew.createChart = function (args) {
+    loadjs.ready(["head", "chart"], function () {
+        let $ = jQuery,
+            canvas = document.getElementById(args.canvasId),
+            config = args.chartJson,
+            showPercentage = args.showPercentage,
+            yFieldFormat = args.yFieldFormat,
+            yAxisFormat = args.yAxisFormat;
+        canvas.dir = "ltr"; // Keep it LTR so currency symbol position in the format pattern will not be changed
+        let formatNumber = function (value, format) {
+            if (format == "Currency")
+                return ew.formatCurrency(value, ew.CURRENCY_FORMAT);
+            else if (format == "Number")
+                return ew.formatNumber(value, ew.NUMBER_FORMAT);
+            else if (format == "Percent")
+                return ew.formatPercent(value, ew.PERCENT_FORMAT);
+            return value;
+        };
+        if (config.data && config.data.datasets.length > 0) {
+            config.options.onHover = function (e) {
+                let el = this.getElementsAtEventForMode(e.native, "nearest", { intersect: true }, false);
+                e.native.target.style.cursor = (el.length) ? "pointer" : "default";
+            };
+            let axis = config.options.indexAxis == "y" ? "x" : "y";
+            if (!["pie", "doughnut"].includes(config.type)) { // Format x/y axis for non pie/doughnut charts
+                // Format Primary Axis (x/y)
+                config.options.scales[axis] = $.extend(true, {}, config.options.scales[axis], {
+                    ticks: {
+                        callback: function (value, index, values) {
+                            let format = yAxisFormat.length ? yAxisFormat[0] : "";
+                            return formatNumber(value, format);
+                        }
+                    }
+                });
+                // Format Secondary Axis (y1)
+                if (config.options.scales["y1"]) {
+                    config = $.extend(true, {}, config, {
+                        options: {
+                            scales: {
+                                y1: {
+                                    ticks: {
+                                        callback: function (value, index, values) {
+                                            let format = yAxisFormat.length > 1 ? yAxisFormat[1] : "";
+                                            return formatNumber(value, format);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            config = $.extend(true, {}, config, {
+                plugins: [ChartDataLabels],
+                options: {
+                    plugins: {
+                        datalabels: {
+                            align: ["line", "area"].includes(config.type) ? "top" : ew.IS_RTL ? "right" : "center",
+                            rotation: config.type == "bar" && config.options.indexAxis != "y" ? -90 : 0, // Rotate label -90 degrees for column chart
+                            formatter: function (value, context) {
+                                let format = yFieldFormat.length > context.datasetIndex ? yFieldFormat[context.datasetIndex] : (yFieldFormat.length > 0 ? yFieldFormat[0] : "");
+                                if (["pie", "doughnut"].includes(config.type) && showPercentage) { // Show as percentage
+                                    let sum = context.dataset.data.reduce((accum, val) => {
+                                        return accum + val;
+                                    });
+                                    value = value / sum;
+                                    format = "Percent";
+                                }
+                                return formatNumber(value, format);
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = ["pie", "doughnut"].includes(config.type) ? context.label || "" : "",
+                                        value = context.raw,
+                                        format = yFieldFormat.length > context.datasetIndex ? yFieldFormat[context.datasetIndex] : (yFieldFormat.length > 0 ? yFieldFormat[0] : "");
+                                    if (label)
+                                        label += ": ";
+                                    if (["pie", "doughnut"].includes(config.type) && showPercentage) {
+                                        let sum = context.dataset.data.reduce((accum, val) => {
+                                            return accum + val;
+                                        });
+                                        value = value / sum;
+                                        format = "Percent";
+                                    }
+                                    label += formatNumber(value, format);
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            }, ew.chartConfig, ew.charts[args.id]); // Deep copy (chart config + global config + user chart config)
+            if (ew.isDark()) {
+                Chart.defaults.borderColor = "rgba(255, 255, 255, 0.2)";
+                Chart.defaults.color = "white";
+            }
+            let evtArgs = { id: args.id, ctx: canvas, config: config };
+            $(document).trigger("chart", [evtArgs]);
+            let chart = new Chart(evtArgs.ctx, evtArgs.config);
+            if (ew.DEBUG)
+                console.log(evtArgs.config);
+            evtArgs.ctx.addEventListener("click", function (e) {
+                let activePoints = chart.getElementsAtEventForMode(e, "index", { intersect: true }, false);
+                if (activePoints[0]) {
+                    let activePoint = activePoints[0],
+                        links = chart.data.datasets[activePoint.datasetIndex].links,
+                        link = Array.isArray(links) ? links[activePoint.index] : {};
+                    if (args.useDrilldownPanel) {
+                        ew.showDrillDown(null, canvas, link.url, link.id, link.hdr);
+                    } else if (args.useDrilldownPanel === false) { // If null, no drilldown
+                        return ew.redirect(link.url);
+                    }
+                }
+            });
+            window.exportCharts["chart_" + args.id] = chart; // Export chart
+        } else {
+            canvas.classList.add("d-none");
+        }
+    });
+};
+</script>
 <!-- Navbar -->
 <script type="text/html" id="navbar-menu-items" class="ew-js-template" data-name="navbar" data-seq="10" data-data="navbar" data-method="appendTo" data-target="#ew-navbar">
 {{if items}}
@@ -214,7 +346,7 @@ ew.ready("head", [
                     <a class="nav-link" data-widget="pushmenu" data-enable-remember="true" data-ew-action="none"><i class="fa-solid fa-bars ew-icon"></i></a>
                 </li>
                 <a class="navbar-brand d-none" href="#" data-ew-action="none">
-                    <span class="brand-text">PHPMaker 2023</span>
+                    <img src="<?= GetUrl("images/IEPROES.png") ?>" alt="" class="brand-image ew-brand-image">
                 </a>
             </ul>
             <!-- Right navbar links -->
@@ -227,7 +359,7 @@ ew.ready("head", [
         <div class="brand-container">
             <!-- Brand Logo //** Note: Only licensed users are allowed to change the logo ** -->
             <a href="#" class="brand-link">
-                <span class="brand-text">PHPMaker 2023</span>
+                <img src="<?= GetUrl("images/IEPROES.png") ?>" alt="" class="brand-image ew-brand-image">
             </a>
             <?php if (preg_match('/\bsidebar-mini\b/', Config("BODY_CLASS"))) { ?>
             <a class="pushmenu mx-1" data-pushmenu="mini" role="button"><i class="fa-solid fa-angle-double-left"></i></a>

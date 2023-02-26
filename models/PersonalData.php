@@ -39,7 +39,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "AsignaturasVwList";
+    public $CurrentPageName = "PromedioxasignaturaRpt";
 
     // Page headings
     public $Heading = "";

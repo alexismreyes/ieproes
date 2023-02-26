@@ -29,7 +29,15 @@ $USER_LEVEL_PRIVS = [["{F73A7286-9F13-4725-9F3C-54E276C53E3B}alumnotbl","-2","0"
     ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}evaluacion_tbl","-2","0"],
     ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}evaluacion_tbl","0","0"],
     ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}asignaturas_vw","-2","0"],
-    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}asignaturas_vw","0","0"]];
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}asignaturas_vw","0","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}calificacionesxalumno_vw","-2","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}calificacionesxalumno_vw","0","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}calificacionesxalumno_rpt","-2","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}calificacionesxalumno_rpt","0","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}promedioxasignatura_vw","-2","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}promedioxasignatura_vw","0","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}promedioxasignatura_rpt","-2","0"],
+    ["{F73A7286-9F13-4725-9F3C-54E276C53E3B}promedioxasignatura_rpt","0","0"]];
 // User level table info
 $USER_LEVEL_TABLES = [["alumnotbl","alumnotbl","Alumnos",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AlumnotblList"],
     ["asignatura_tbl","asignatura_tbl","Asignaturas",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AsignaturaTblList"],
@@ -41,4 +49,8 @@ $USER_LEVEL_TABLES = [["alumnotbl","alumnotbl","Alumnos",true,"{F73A7286-9F13-47
     ["alumnos_asignatura_tbl","alumnos_asignatura_tbl","Asignaturas Cursadas",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AlumnosAsignaturaTblList"],
     ["alumnosporasigntura_vw","alumnosporasigntura_vw","alumnosporasigntura vw",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AlumnosporasignturaVwList"],
     ["evaluacion_tbl","evaluacion_tbl","Tipos de evaluaciones",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","EvaluacionTblList"],
-    ["asignaturas_vw","asignaturas_vw","asignaturas vw",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AsignaturasVwList"]];
+    ["asignaturas_vw","asignaturas_vw","asignaturas vw",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","AsignaturasVwList"],
+    ["calificacionesxalumno_vw","calificacionesxalumno_vw","Calificaciones x alumno",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","CalificacionesxalumnoVwList"],
+    ["calificacionesxalumno_rpt","calificacionesxalumno_rpt","Calificaciones por alumno",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","CalificacionesxalumnoRpt"],
+    ["promedioxasignatura_vw","promedioxasignatura_vw","promedioxasignatura vw",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","PromedioxasignaturaVwList"],
+    ["promedioxasignatura_rpt","promedioxasignatura_rpt","Promedios por asignatura",true,"{F73A7286-9F13-4725-9F3C-54E276C53E3B}","PromedioxasignaturaRpt"]];
