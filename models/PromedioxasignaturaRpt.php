@@ -207,7 +207,7 @@ class PromedioxasignaturaRpt extends ReportTable
         ]); // Show names / Show values / Show hover
         $this->promediopormateria_chart->setParameter("alpha", "50"); // Chart alpha
         $this->promediopormateria_chart->setParameter("colorpalette", "#5899DA,#E8743B,#19A979,#ED4A7B,#945ECF,#13A4B4,#525DF4,#BF399E,#6C8893,#EE6868,#2F6497"); // Chart color palette
-        $this->promediopormateria_chart->setParameters([["options.layout.padding",10],["options.plugins.title.font.size",20],["options.plugins.filler.propagate",false]]);
+        $this->promediopormateria_chart->setParameters([["options.animation.duration",0],["options.layout.padding",10],["options.plugins.title.font.size",20],["options.plugins.filler.propagate",false]]);
         $this->Charts[$this->promediopormateria_chart->ID] = &$this->promediopormateria_chart;
 
         // alumnosporasignatura_chart
@@ -239,7 +239,7 @@ class PromedioxasignaturaRpt extends ReportTable
         ]); // Show names / Show values / Show hover
         $this->alumnosporasignatura_chart->setParameter("alpha", "50"); // Chart alpha
         $this->alumnosporasignatura_chart->setParameter("colorpalette", "#5899DA,#E8743B,#19A979,#ED4A7B,#945ECF,#13A4B4,#525DF4,#BF399E,#6C8893,#EE6868,#2F6497"); // Chart color palette
-        $this->alumnosporasignatura_chart->setParameters([["options.layout.padding",20],["options.plugins.title.font.size",20]]);
+        $this->alumnosporasignatura_chart->setParameters([["options.animation.duration",0],["options.layout.padding",20],["options.plugins.title.font.size",20]]);
         $this->Charts[$this->alumnosporasignatura_chart->ID] = &$this->alumnosporasignatura_chart;
 
         // Add Doctrine Cache

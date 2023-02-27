@@ -16,14 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `ieproes_db`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `ieproes_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
-
-USE `ieproes_db`;
-
---
 -- Table structure for table `alumnos_asignatura_tbl`
 --
 
@@ -35,7 +27,7 @@ CREATE TABLE `alumnos_asignatura_tbl` (
   `fk_id_alumno` int(11) NOT NULL,
   `fk_id_asignatura` int(11) NOT NULL,
   PRIMARY KEY (`id_alumnosasignatura`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,7 +36,7 @@ CREATE TABLE `alumnos_asignatura_tbl` (
 
 LOCK TABLES `alumnos_asignatura_tbl` WRITE;
 /*!40000 ALTER TABLE `alumnos_asignatura_tbl` DISABLE KEYS */;
-INSERT INTO `alumnos_asignatura_tbl` VALUES (1,1,2),(2,2,2),(3,3,6),(4,4,6),(10,5,2),(13,5,3),(14,5,4),(15,1,4),(16,4,4),(17,4,1),(18,1,1),(19,3,1),(20,6,1),(21,6,5),(22,7,2),(23,7,6);
+INSERT INTO `alumnos_asignatura_tbl` VALUES (1,1,2),(2,2,2),(3,3,6),(4,4,6),(10,5,2),(13,5,3),(14,5,4),(15,1,4),(16,4,4),(17,4,1),(18,1,1),(19,3,1),(20,6,1),(21,6,5),(22,7,2),(23,7,6),(24,5,5),(25,2,5),(26,7,7),(27,6,7),(28,4,7),(29,1,3),(30,3,3),(31,6,3),(32,7,8),(33,2,8),(34,3,8);
 /*!40000 ALTER TABLE `alumnos_asignatura_tbl` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -106,7 +98,7 @@ CREATE TABLE `asignatura_tbl` (
   `nombre_asignatura` varchar(60) NOT NULL,
   `id_profesor` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_asignatura`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -115,7 +107,7 @@ CREATE TABLE `asignatura_tbl` (
 
 LOCK TABLES `asignatura_tbl` WRITE;
 /*!40000 ALTER TABLE `asignatura_tbl` DISABLE KEYS */;
-INSERT INTO `asignatura_tbl` VALUES (1,'Ciencias Naturales',4),(2,'Ciencias Sociales',2),(3,'Informática',5),(4,'Matemáticas',3),(5,'Moral y Civica',4),(6,'Lenguaje y literatura',2);
+INSERT INTO `asignatura_tbl` VALUES (1,'Ciencias Naturales',4),(2,'Ciencias Sociales',2),(3,'Informática',5),(4,'Matemáticas',3),(5,'Moral y Civica',4),(6,'Lenguaje y literatura',2),(7,'Psicologia',2),(8,'Economia',5);
 /*!40000 ALTER TABLE `asignatura_tbl` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -148,7 +140,7 @@ CREATE TABLE `calificacion_tbl` (
   `fk_id_alumno` int(11) NOT NULL,
   `fk_id_evaluacion` int(11) NOT NULL,
   PRIMARY KEY (`id_calificacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -157,7 +149,7 @@ CREATE TABLE `calificacion_tbl` (
 
 LOCK TABLES `calificacion_tbl` WRITE;
 /*!40000 ALTER TABLE `calificacion_tbl` DISABLE KEYS */;
-INSERT INTO `calificacion_tbl` VALUES (21,'10',NULL,6,3,3),(22,'8',NULL,2,2,1),(23,'8',NULL,6,3,2),(29,'8',NULL,4,5,2),(30,'7',NULL,4,1,2),(31,'8',NULL,4,5,1),(32,'10',NULL,1,4,2),(33,'8',NULL,1,1,2),(34,'7',NULL,1,4,1),(35,'10',NULL,1,6,2),(36,'9',NULL,1,6,1),(37,'10','Muy buena estudiante',3,5,2),(38,'7',NULL,4,4,2),(39,'10','Bien hecho',2,1,1),(40,'8',NULL,2,5,1),(41,'10',NULL,6,4,2),(42,'8',NULL,6,4,3),(43,'7',NULL,2,7,2),(44,'8',NULL,2,7,1),(45,'7.5',NULL,6,7,2),(46,'8',NULL,6,7,1);
+INSERT INTO `calificacion_tbl` VALUES (21,'10',NULL,6,3,3),(22,'8',NULL,2,2,1),(23,'8',NULL,6,3,2),(29,'8',NULL,4,5,2),(30,'7',NULL,4,1,2),(31,'8',NULL,4,5,1),(32,'10',NULL,1,4,2),(33,'8',NULL,1,1,2),(34,'7',NULL,1,4,1),(35,'10',NULL,1,6,2),(36,'9',NULL,1,6,1),(37,'10','Muy buena estudiante',3,5,2),(38,'7',NULL,4,4,2),(39,'10','Bien hecho',2,1,1),(40,'8',NULL,2,5,1),(41,'10',NULL,6,4,2),(42,'8',NULL,6,4,3),(43,'7',NULL,2,7,2),(44,'8',NULL,2,7,1),(45,'7.5',NULL,6,7,2),(46,'8',NULL,6,7,1),(47,'10',NULL,5,6,3),(48,'8',NULL,5,5,1),(49,'9',NULL,5,2,1),(50,'7',NULL,5,6,1),(51,'7',NULL,5,5,3),(52,'7',NULL,5,2,3),(53,'8',NULL,1,1,1),(54,'9',NULL,1,1,3),(55,'7',NULL,1,4,3),(56,'8',NULL,4,1,1),(57,'7',NULL,4,4,1),(58,'7',NULL,2,1,2),(59,'9',NULL,2,2,2),(60,'6.5',NULL,2,5,2),(61,'8',NULL,7,7,2),(62,'9',NULL,7,7,1),(63,'9',NULL,7,6,2),(64,'7.5',NULL,7,6,1),(65,'10',NULL,7,4,2),(66,'9.5',NULL,7,4,1),(67,'9',NULL,3,5,1),(68,'8',NULL,3,1,2),(69,'10',NULL,3,1,1),(70,'6',NULL,3,3,2),(71,'8',NULL,3,3,1),(72,'7',NULL,3,6,2),(73,'7.5',NULL,3,6,1),(74,'8',NULL,8,7,2),(75,'8.5',NULL,8,7,1),(76,'9',NULL,8,7,3),(77,'6',NULL,8,2,2),(78,'7.5',NULL,8,2,5),(79,'8',NULL,8,2,1),(80,'8',NULL,8,3,2),(81,'9',NULL,8,3,5),(82,'9.5',NULL,8,3,7);
 /*!40000 ALTER TABLE `calificacion_tbl` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -323,12 +315,6 @@ INSERT INTO `usuarios_tbl` VALUES (1,'admin','ieproespass',-1,'',NULL,0),(2,'jua
 UNLOCK TABLES;
 
 --
--- Current Database: `ieproes_db`
---
-
-USE `ieproes_db`;
-
---
 -- Final view structure for view `alumnosporasigntura_vw`
 --
 
@@ -409,4 +395,4 @@ USE `ieproes_db`;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-26 17:26:03
+-- Dump completed on 2023-02-27 17:30:40

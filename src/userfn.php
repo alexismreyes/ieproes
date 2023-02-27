@@ -143,6 +143,14 @@ function Api_Action($app)
     // $app->get('/myaction2', function ($request, $response, $args) {
     //    return $response->withJson(["name" => "myaction2"]); // Note: Always return Psr\Http\Message\ResponseInterface object
     // });
+
+        // Example:
+    $app->get('/myaction', function ($request, $response, $args) {
+    return $response->withJson(["name" => "myaction"]); // Note: Always return Psr\Http\Message\ResponseInterface object
+    });
+    /* $app->get('/myaction2', function ($request, $response, $args) {
+    return $response->withJson(["name" => "myaction2"]); // Note: Always return Psr\Http\Message\ResponseInterface object
+    }); */
 }
 
 // Container Build event

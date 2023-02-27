@@ -142,7 +142,7 @@ $CONFIG = [
 
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => 'W9P9p9ArMHvrjENT', // Random key for encryption
+    "RANDOM_KEY" => '9GmdyAcvW1pgKj8r', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/ieproes.css", // Project stylesheet file name
     "USE_COMPRESSED_STYLESHEET" => true, // Compressed stylesheet
